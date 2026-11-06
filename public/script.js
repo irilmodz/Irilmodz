@@ -121,7 +121,7 @@
   }
 
   function bootCore() {
-    var V = '3.4.1';
+    var V = '3.5.0';
     var BRAND = 'iRiLLL MODZ';
     function log() { try { console.log.apply(console, ['[iR]'].concat([].slice.call(arguments))); } catch (e) {} }
 
@@ -1622,16 +1622,33 @@
     try { requestAnimationFrame(qcTick); } catch (e) {}
 
     var PR = { on: 0, ms: 120 };
-    var RF = { on: 0 };
+    var RF = { on: 0, last: 0 };
+    
+    // PERBAIKAN: RAPID FIRE MENJADI FULL AUTO (RIFLE MODE) UNTUK SEMUA SENJATA
     function rfTick() {
       requestAnimationFrame(rfTick);
       if (!RF.on) return;
       try {
         var g = G || game(); if (!g || !g.P) return;
         var p = g.P, w = null; try { w = p.W; } catch (e) {}
-        if (!w || w.melee || w.c4 || w.grenade) return;
+        if (!w) return;
+
+        // Paksa semua senjata (Sniper, Pistol, Melee, Shotgun, dll) jadi Full Auto
+        if (w.auto === false) w.auto = true;
+        if (w.auto === 0) w.auto = 1;
+        if (w.semi === true) w.semi = false;
+        if (w.semi === 1) w.semi = 0;
+        
+        // Hapus semua jeda / cooldown / delay
+        if (typeof w.rate === 'number' && w.rate > 0.01) w.rate = 0.01;
+        if (typeof w.delay === 'number' && w.delay > 0) w.delay = 0;
+        if (typeof w.fireDelay === 'number' && w.fireDelay > 0) w.fireDelay = 0;
+        if (typeof w.boltTime === 'number' && w.boltTime > 0) w.boltTime = 0;
+        if (typeof w.boltDelay === 'number' && w.boltDelay > 0) w.boltDelay = 0;
+
         if (typeof p.nextShot === 'number' && p.nextShot > 0) p.nextShot = 0;
         if (typeof p.swapEnd === 'number' && p.swapEnd > 0) p.swapEnd = 0;
+        if (typeof p.shotT === 'number') p.shotT = 0;
       } catch (e) {}
     }
     try { requestAnimationFrame(rfTick); } catch (e) {}
@@ -2129,7 +2146,7 @@
       var css = [
         '.fk{position:fixed;top:8px;right:8px;z-index:2147483600;font:12px/1.3 system-ui,Tahoma,sans-serif;color:#1f2937;',
         '  background:#fff;border:1px solid #e8ecf0;border-radius:10px;',
-        '  box-shadow:0 3px 14px rgba(0,0,0,.08);pointer-events:auto;user-select:none;overflow:hidden;transition:width .15s,height .15s}',
+        '  box-shadow:0 3px 14px rgba(0,0,0,.08);pointer-events:auto;user-select:none;overflow:hidden;transition:width .15s,height .15s;max-height:96vh;display:flex;flex-direction:column}',
         '.fk.hide{display:none}',
         '.fk.expanded{display:flex;flex-direction:row}',
         '.fk.expanded .fk-rail{display:flex;flex-direction:column;background:#fafbfc;border-right:1px solid #eef1f4;',
@@ -2518,8 +2535,11 @@
       pShoot.appendChild(sec('fa-gun', 'Fire Rate'));
       var sfT = toggle('smooth_fire', false, function (on) { window.__pbx.smoothFire(on); });
       pShoot.appendChild(row('Smooth fire', sfT.node, 'Anti macet'));
+      
+      // PERUBAHAN UI UNTUK RAPID FIRE
       var rapidT = toggle('rapid_fire', false, function (on) { window.__pbx.rapid(on); });
-      pShoot.appendChild(rowRisk('Rapid fire', rapidT.node, 'Hilangkan jeda'));
+      pShoot.appendChild(rowRisk('Force Auto (Rifling)', rapidT.node, 'Sniper/Pistol/Shotgun otomatis'));
+      
       var isT2 = toggle('inst_scope', false, function (on) { window.__pbx.instScope(on); });
       pShoot.appendChild(rowRisk('Instant scope', isT2.node, 'Scope cepat'));
 
@@ -2767,7 +2787,10 @@
       (function () {
         var dragging = false, ox = 0, oy = 0;
         function dragStart(e) {
+          // PERBAIKAN BUG: Abaikan klik pada dropdown/select, tombol, dan input
           if (e.target === toggleBtn || e.target === hideUiBtn || e.target === tbOpen) return;
+          if (e.target.tagName === 'SELECT' || e.target.tagName === 'OPTION' || e.target.tagName === 'INPUT') return;
+          
           dragging = true;
           var clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
           var clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);

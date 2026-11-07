@@ -10,7 +10,7 @@
 
   var PF_LOCAL_KEYS = [
     'IRILMODZPREMIUM','I','AKBAR','IRIL-EFGH-5678','IRIL-IJKL-9012',
-    'my key 123','IRILMODZPREMIUM7DAY','EXPIREDTGGL7','IRILMODZ7DAY'
+    'my key 123','IRILAY','EXPI7','IRILDAY'
   ];
 
   function pfGet(k, d) { try { var v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } }
@@ -560,40 +560,53 @@
       holding = false;
     }
 
+    // PENGATURAN MOUSE & TOUCH: HANYA MENDETEKSI MOUSE ATAU TOMBOL TEMBAK ASLI GAME
     addEventListener('mousemove', function (e) {
       if (e.movementX || e.movementY) aimWrite(e.movementX, e.movementY);
     }, true);
+    
     addEventListener('mousedown', function (e) {
       if (e.button === 0) { fireHeld = 1; AB.freshFire = 1; st.fire = 1; }
     }, true);
     addEventListener('mouseup', function (e) {
       if (e.button === 0) { fireHeld = 0; st.fire = 0; }
     }, true);
+    
     addEventListener('blur', function () { fireHeld = 0; st.fire = 0; AB.freshFire = 0; FLY.jumpHeld = 0; });
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) { fireHeld = 0; st.fire = 0; }
     });
 
-    var fireIds = new Set();
-    function inZone(t) { return t.clientX > innerWidth * 0.50 && t.clientY > innerHeight * 0.45; }
-    function syncFire() { fireHeld = fireIds.size; st.fire = fireHeld; }
-    addEventListener('touchstart', function (e) {
-      for (var i = 0; i < e.changedTouches.length; i++) {
-        var t = e.changedTouches[i];
-        if (inZone(t)) { fireIds.add(t.identifier); AB.freshFire = 1; }
+    // SISTEM PENCARIAN OTOMATIS TOMBOL TEMBAK ASLI GAME (HTML / UI GAME)
+    // Script akan otomatis mencari elemen tombol tembak game (berdasarkan id/class/atribut bawaan game)
+    var fireElementBound = false;
+    function bindRealFireButton() {
+      if (fireElementBound) return;
+      // Mencari tombol tembak umum di game web/mobile HTML
+      var fireBtnSelectors = [
+        '#fire', '#btn-fire', '.btn-fire', '[data-action="fire"]', '[class*="fire"]', '[id*="fire"]',
+        '#shoot', '#btn-shoot', '.btn-shoot', '[data-action="shoot"]', '[class*="shoot"]', '[id*="shoot"]'
+      ];
+      
+      for (var i = 0; i < fireBtnSelectors.length; i++) {
+        var el = document.querySelector(fireBtnSelectors[i]);
+        if (el && !el.__pbFireBound) {
+          el.__pbFireBound = true;
+          el.addEventListener('touchstart', function(e) {
+            fireHeld = 1; AB.freshFire = 1; st.fire = 1;
+          }, { passive: true });
+          el.addEventListener('touchend', function(e) {
+            fireHeld = 0; st.fire = 0;
+          }, { passive: true });
+          el.addEventListener('touchcancel', function(e) {
+            fireHeld = 0; st.fire = 0;
+          }, { passive: true });
+          fireElementBound = true;
+          break;
+        }
       }
-      syncFire();
-    }, true);
-    addEventListener('touchmove', function (e) {
-      for (var i = 0; i < e.changedTouches.length; i++) {
-        var t = e.changedTouches[i];
-        if (inZone(t)) fireIds.add(t.identifier); else fireIds.delete(t.identifier);
-      }
-      syncFire();
-    }, true);
-    function touchEnd(e) { for (var i = 0; i < e.changedTouches.length; i++) fireIds.delete(e.changedTouches[i].identifier); syncFire(); }
-    addEventListener('touchend', touchEnd, true);
-    addEventListener('touchcancel', touchEnd, true);
+    }
+    setInterval(bindRealFireButton, 2000);
 
     var FL = {
       wallbang: 0, infAmmo: 0, noRecoil: 0, godmode: 0, noclip: 0,
@@ -1137,7 +1150,7 @@
     };
     window.__pb = PB_API; HIDDEN.pb = PB_API;
 
-    /* ===== ULTRA FAST & LIGHT ESP (FIXED GHOST & DELAY) ===== */
+    /* ===== ULTRA FAST & LIGHT ESP ===== */
     var E = { on: 0, wrap: null, host: null, hostRect: null, hostAt: 0, slots: [], last: 0, n: 0 };
     function eInit() {
       if (E.wrap && E.wrap.parentNode) return true;
@@ -1211,7 +1224,7 @@
       for (var i = 0; i < list.length; i++) {
         var p = list[i];
         if (!p || p === self || p.dead || !(p.hp > 0) || p.team === my) continue;
-        if (!p.obj || p.obj.visible === false || !p.obj.parent) continue; // Skip hantu/obj tak terlihat
+        if (!p.obj || p.obj.visible === false || !p.obj.parent) continue;
         
         var hp = headPoint(p); if (!hp) continue;
         var mm = p.obj.matrixWorld && p.obj.matrixWorld.elements; if (!mm) continue;
@@ -1231,7 +1244,6 @@
         var intW = +bw.toFixed(1);
         var intH = +bh.toFixed(1);
 
-        // OPTIMASI GPU ACCELERATION (Transform3D)
         if (s.lastX !== posX || s.lastY !== posY || s.lastW !== intW || s.lastH !== intH) {
           s.box.style.transform = 'translate3d(' + posX + 'px,' + posY + 'px,0)';
           s.box.style.width = intW + 'px';
@@ -1359,7 +1371,6 @@
       }
       if (!E.on) { eClear(); } else {
         var t = performance.now();
-        // SINKRONISASI PENUH: Render setiap frame (0ms delay) agar tidak berbayang
         if (t - E.last < 16) {} else { 
           E.last = t;
           if (!eInit()) {} else if (!g) { eClear(); } else { try { eDraw(g); } catch (err) { eClear(); } }
@@ -1624,7 +1635,6 @@
     var PR = { on: 0, ms: 120 };
     var RF = { on: 0, last: 0 };
     
-    // PERBAIKAN: RAPID FIRE MENJADI FULL AUTO (RIFLE MODE) UNTUK SEMUA SENJATA
     function rfTick() {
       requestAnimationFrame(rfTick);
       if (!RF.on) return;
@@ -1633,13 +1643,11 @@
         var p = g.P, w = null; try { w = p.W; } catch (e) {}
         if (!w) return;
 
-        // Paksa semua senjata (Sniper, Pistol, Melee, Shotgun, dll) jadi Full Auto
         if (w.auto === false) w.auto = true;
         if (w.auto === 0) w.auto = 1;
         if (w.semi === true) w.semi = false;
         if (w.semi === 1) w.semi = 0;
         
-        // Hapus semua jeda / cooldown / delay
         if (typeof w.rate === 'number' && w.rate > 0.01) w.rate = 0.01;
         if (typeof w.delay === 'number' && w.delay > 0) w.delay = 0;
         if (typeof w.fireDelay === 'number' && w.fireDelay > 0) w.fireDelay = 0;
@@ -2126,7 +2134,7 @@
     }, 1000);
 
     /* ============================================================
-       UI & FPS REALTIME MONITOR + HIDE UI (FA-ICON TRANSPARAN KECIL)
+       UI & FPS REALTIME MONITOR + HIDE UI
        ============================================================ */
     (function pbUI() {
       if (window.__pbUI) return;
@@ -2434,7 +2442,6 @@
         try { localStorage.setItem(TAB_KEY, key); } catch (e) {}
       }
 
-      /* ===== AIM ===== */
       var pAim = addTab('aim', 'AIM');
       pAim.appendChild(sec('fa-crosshairs', 'Mode Aim Lock'));
 
@@ -2467,7 +2474,6 @@
       var invertT = toggle('aim_invert', false, function (on) { O.invert = on; });
       pAim.appendChild(row('Invert Y', invertT.node, 'Balik arah vertikal'));
 
-      /* ===== AIMBOT ===== */
       var pAb = addTab('aimbot', 'AIMBOT');
       pAb.appendChild(sec('fa-bullseye', 'Aimbot'));
       var aimbotT = toggle('aimbot_en', false, function (on) { window.__pb.aimbot(on); });
@@ -2490,7 +2496,6 @@
       povCircleS.label.textContent = 'Circle size';
       pAb.appendChild(povCircleS.node);
 
-      /* ===== ESP ===== */
       var pEsp = addTab('esp', 'ESP');
       pEsp.appendChild(sec('fa-layer-group', 'Overlay'));
       var espT = toggle('esp_enemy', false, function (on) { if (on) window.__pbvis.on(); else window.__pbvis.off(); });
@@ -2512,7 +2517,6 @@
       var dmgS = slider(1.0, 3.0, 0.05, 1.3, function (v) { return 'x' + v.toFixed(2); }, function (v) { if (window.__pbvis) window.__pbvis.dmg(v); });
       dmgS.label.textContent = 'Damage'; pEsp.appendChild(dmgS.node);
 
-      /* ===== SILENT ===== */
       var pSil = addTab('silent', 'SILENT');
       pSil.appendChild(sec('fa-crosshairs', 'Silent Aim'));
       var saT = toggle('silent_aim', false, function (on) { window.__pbx.silent(on); });
@@ -2530,20 +2534,17 @@
       var predS = slider(0, 400, 10, PR.ms, function (v) { return v.toFixed(0) + 'ms'; }, function (v) { PR.ms = v; if (PR.on) window.__pbx.pred(1, v); });
       predS.label.textContent = 'Lead time'; pSil.appendChild(predS.node);
 
-      /* ===== SHOOT ===== */
       var pShoot = addTab('shoot', 'SHOOT');
       pShoot.appendChild(sec('fa-gun', 'Fire Rate'));
       var sfT = toggle('smooth_fire', false, function (on) { window.__pbx.smoothFire(on); });
       pShoot.appendChild(row('Smooth fire', sfT.node, 'Anti macet'));
       
-      // PERUBAHAN UI UNTUK RAPID FIRE
       var rapidT = toggle('rapid_fire', false, function (on) { window.__pbx.rapid(on); });
       pShoot.appendChild(rowRisk('Force Auto (Rifling)', rapidT.node, 'Sniper/Pistol/Shotgun otomatis'));
       
       var isT2 = toggle('inst_scope', false, function (on) { window.__pbx.instScope(on); });
       pShoot.appendChild(rowRisk('Instant scope', isT2.node, 'Scope cepat'));
 
-      /* ===== COMBAT ===== */
       var pCombat = addTab('combat', 'COMBAT');
       pCombat.appendChild(sec('fa-shield-halved', 'Weapon'));
       var wallT = toggle('combat_wallbang', false, function (on) { window.__pbx.wallbang(on); });
@@ -2553,13 +2554,12 @@
       var nrecT = toggle('combat_norecoil', false, function (on) { window.__pbx.noRecoil(on); });
       pCombat.appendChild(rowRisk('No recoil', nrecT.node, 'Recoil nol'));
 
-      /* ===== FLY ===== */
       var pFly = addTab('fly', 'FLY');
       pFly.appendChild(sec('fa-plane', 'Fly'));
       var flyT = toggle('fly_on', false, function (on) { window.__pbx.fly(on); });
       pFly.appendChild(rowRisk('Fly', flyT.node, 'Hold jump = naik'));
       var flyBypassT = toggle('fly_bypass', false, function (on) { window.__pbx.flyBypass(on); });
-      pFly.appendChild(rowRisk('Fly bypass', flyBypassT.node, 'Anti deteksi fly'));
+      pFly.appendChild(rowRisk('Fly bypass', flyT.node, 'Anti deteksi fly'));
       var flyModeSel = el('select', 'fk-select');
       flyModeSel.innerHTML =
         '<option value="jump">Jump</option>' +
@@ -2568,13 +2568,11 @@
       flyModeSel.addEventListener('change', function () { window.__pbx.flyMode(this.value); });
       pFly.appendChild(flyModeSel);
 
-      /* ===== NOCLIP ===== */
       var pNc = addTab('noclip', 'NOCLIP');
       pNc.appendChild(sec('fa-ghost', 'Noclip'));
       var ncT = toggle('noclip_real', false, function (on) { window.__pbx.noclip(on); });
       pNc.appendChild(rowRisk('Noclip (real)', ncT.node, 'Tembus dinding'));
 
-      /* ===== NADE ===== */
       var pNade = addTab('nade', 'NADE');
       pNade.appendChild(sec('fa-bomb', 'Silent Nade'));
       var snadeT = toggle('silent_nade', false, function (on) { window.__pbx.silentNade(on); });
@@ -2599,13 +2597,11 @@
       var infNadeSt = el('div', 'fk-nade-st', 'memuat…');
       pNade.appendChild(infNadeSt);
 
-      /* ===== MOVE ===== */
       var pMove = addTab('move', 'MOVE');
       pMove.appendChild(sec('fa-feather', 'Survival'));
       var noFallT = toggle('no_fall', false, function (on) { window.__pbx.noFall(on); });
       pMove.appendChild(row('No fall damage', noFallT.node, 'Tidak mati jatuh'));
 
-      /* ===== MISC ===== */
       var pMisc = addTab('misc', 'MISC');
       pMisc.appendChild(sec('fa-right-left', 'Quick Swap'));
       var qcT = toggle('quick_swap', false, function (on) { if (on) window.__pbqc.on(); else window.__pbqc.off(); });
@@ -2628,7 +2624,6 @@
       var akT = toggle('anti_kick', false, function (on) { window.__pbx.antiKick(on); });
       pMisc.appendChild(rowRisk('Anti-kick', akT.node, 'Blokir kick/ban'));
 
-      /* ===== INFO ===== */
       var pInfo = addTab('info', 'INFO');
       pInfo.appendChild(sec('fa-signal', 'Status'));
       var foot = el('div', 'fk-foot', '');
@@ -2787,7 +2782,6 @@
       (function () {
         var dragging = false, ox = 0, oy = 0;
         function dragStart(e) {
-          // PERBAIKAN BUG: Abaikan klik pada dropdown/select, tombol, dan input
           if (e.target === toggleBtn || e.target === hideUiBtn || e.target === tbOpen) return;
           if (e.target.tagName === 'SELECT' || e.target.tagName === 'OPTION' || e.target.tagName === 'INPUT') return;
           

@@ -121,7 +121,7 @@
   }
 
   function bootCore() {
-    var V = '3.5.0';
+    var V = '3.5.2';
     var BRAND = 'iRiLLL MODZ';
     function log() { try { console.log.apply(console, ['[iR]'].concat([].slice.call(arguments))); } catch (e) {} }
 
@@ -1622,15 +1622,404 @@
         if (QC.invRef !== p.inv) { QC.invRef = p.inv; QC.gate = {}; QC.slot = p.slot; QC.ammo = p.ammo; }
         if (s.dead) { if (!QC.dead) { QC.dead = 1; QC.gate = {}; } QC.slot = p.slot; QC.ammo = p.ammo; return; }
         if (QC.dead) { QC.dead = 0; QC.gate = {}; QC.slot = p.slot; QC.ammo = p.ammo; }
-        if (p.slot === QC.slot && typeof p.ammo === 'number' && QC.ammo >= 0 && p.ammo < QC.ammo) { QC.gate[p.slot] = +p.nextShot || 0; QC.n++; }
+
+        var mqqBusy = (typeof MQQ !== 'undefined') && (MQQ.busy || performance.now() < (MQQ.freezeUntil || 0));
+
+        if (p.slot === QC.slot && typeof p.ammo === 'number' && QC.ammo >= 0 && p.ammo < QC.ammo && !mqqBusy) {
+          QC.gate[p.slot] = +p.nextShot || 0; QC.n++;
+        }
         if (p.slot !== QC.slot) {
-          if (QC.on) { p.swapEnd = 0; p.nextShot = QC.fast ? 0 : (QC.gate[p.slot] || 0); try { if (p.fpActs && p.fpActs.change) p.fpActs.change.timeScale = 8; } catch (e) {} QC.sw++; }
+          if (QC.on && !mqqBusy) {
+            p.swapEnd = 0;
+            p.nextShot = QC.fast ? 0 : (QC.gate[p.slot] || 0);
+            try { if (p.fpActs && p.fpActs.change) p.fpActs.change.timeScale = 8; } catch (e) {}
+            QC.sw++;
+          }
           QC.slot = p.slot;
         }
         QC.ammo = p.ammo;
       } catch (e) {}
     }
     try { requestAnimationFrame(qcTick); } catch (e) {}
+
+    /* ===== MAKRO AUTO QQ (dari MACROQQ.js) ===== */
+    var MQQ = {
+      on: 0,
+      fast: 1,
+      busy: 0,
+      qqCount: 0,
+      meleeSlot: -1,
+      primarySlot: -1,
+      activePrimarySlot: -1,
+      ammoPeak: -1,
+      lastSlot: 0,
+      lastFireT: 0,
+      guardUntil: 0,
+      freezeUntil: 0,
+      seq: 0,
+      tSettleMelee: 18,
+      tReturnDelay: 12,
+      tSettlePrimary: 8,
+      lastSyncedSlot: -1,
+      pendingTrigger: 0,
+      lastShotSig: '',
+      ytPrev: false,
+      trigPrev: false
+    };
+
+    (function mqqLoadPrimary() {
+      try {
+        var v = localStorage.getItem('ir_qq_primary');
+        if (v === '1' || v === '2') MQQ.primarySlot = +v;
+        else MQQ.primarySlot = 1;
+      } catch (e) { MQQ.primarySlot = 1; }
+    })();
+
+    (function mqqLoadTiming() {
+      try {
+        var a = parseFloat(localStorage.getItem('ir_qq_t_melee'));
+        var b = parseFloat(localStorage.getItem('ir_qq_t_return'));
+        var c = parseFloat(localStorage.getItem('ir_qq_t_primary'));
+        if (isFinite(a) && a >= 5 && a <= 200) MQQ.tSettleMelee = a;
+        if (isFinite(b) && b >= 5 && b <= 200) MQQ.tReturnDelay = b;
+        if (isFinite(c) && c >= 5 && c <= 200) MQQ.tSettlePrimary = c;
+      } catch (e) {}
+    })();
+
+    function mqqSaveTiming() {
+      try {
+        localStorage.setItem('ir_qq_t_melee', String(MQQ.tSettleMelee));
+        localStorage.setItem('ir_qq_t_return', String(MQQ.tReturnDelay));
+        localStorage.setItem('ir_qq_t_primary', String(MQQ.tSettlePrimary));
+      } catch (e) {}
+    }
+
+    function mqqDetectSlots() {
+      var g = G || game();
+      if (!g || !g.P || !g.P.inv) return false;
+      var P2 = g.P;
+      var melee = -1;
+      for (var k in P2.inv) {
+        var s = P2.inv[k];
+        if (!s || !s.w) continue;
+        var slot = +k;
+        if (s.w.melee && melee < 0) melee = slot;
+      }
+      if (melee < 0) return false;
+      MQQ.meleeSlot = melee;
+      return true;
+    }
+
+    function mqqMeleeOk() {
+      var g = G || game();
+      if (!g || !g.P || !g.P.inv) return false;
+      if (MQQ.meleeSlot < 0) { if (!mqqDetectSlots()) return false; }
+      var s = g.P.inv[MQQ.meleeSlot];
+      return !!(s && s.w && s.w.melee);
+    }
+
+    function mqqPrimaryOk(slot) {
+      var g = G || game();
+      if (!g || !g.P || !g.P.inv) return false;
+      var s = g.P.inv[slot];
+      if (!s || !s.w) return false;
+      return !s.w.melee && !s.w.grenade && !s.w.c4;
+    }
+
+    function mqqResolvePrimary(P2) {
+      if (MQQ.activePrimarySlot > 0 && mqqPrimaryOk(MQQ.activePrimarySlot)) return MQQ.activePrimarySlot;
+      if ((MQQ.primarySlot === 1 || MQQ.primarySlot === 2) && mqqPrimaryOk(MQQ.primarySlot)) return MQQ.primarySlot;
+      if (mqqPrimaryOk(1)) return 1;
+      if (mqqPrimaryOk(2)) return 2;
+      return -1;
+    }
+
+    function mqqSyncSlotOnce(P2, slot) {
+      if (MQQ.lastSyncedSlot === slot) return;
+      MQQ.lastSyncedSlot = slot;
+      try {
+        var w = P2.inv && P2.inv[slot] && P2.inv[slot].w;
+        if (!w) return;
+
+        if (P2.fpMeshes) {
+          for (var k in P2.fpMeshes) {
+            var m = P2.fpMeshes[k];
+            if (m) m.visible = (+k === slot);
+          }
+        }
+        if (P2.fpLeft) {
+          for (var k2 in P2.fpLeft) {
+            var m2 = P2.fpLeft[k2];
+            if (m2) m2.visible = (+k2 === slot);
+          }
+        }
+        if (P2.s && P2.s.meshes) {
+          P2.s.meshes.forEach(function (mesh, wid) {
+            if (!mesh) return;
+            var active = (wid === w || wid.id === w.id || wid === slot);
+            mesh.visible = active;
+            if (mesh.userData && mesh.userData.left) mesh.userData.left.visible = active;
+          });
+        }
+
+        P2.fpActs = (P2.fpSets && P2.fpSets[slot]) || P2.fpActs || {};
+        P2.fpCur = null;
+        P2.leftCur = null;
+        P2.shellLoop = false;
+        P2.shellOpened = false;
+        P2.zoomLvl = 0;
+        P2.zoom = false;
+        P2.boltTok = null;
+        P2.boltEnd = 0;
+        P2.pinning = false;
+        P2.extOn = false;
+        P2.reloading = 0;
+        P2.flash = (P2.flashes && P2.flashes[slot]) || null;
+
+        var actChange = P2.fpActs && P2.fpActs.change;
+        if (actChange && typeof actChange.stop === 'function') {
+          try {
+            actChange.stop();
+            actChange.setEffectiveWeight(0);
+          } catch (e) {}
+        }
+      } catch (e) {}
+    }
+
+    function mqqAt(slot, antiFire) {
+      var g = G || game();
+      if (!g || !g.P) return false;
+      var P2 = g.P;
+      if (!P2.inv || !P2.inv[slot]) return false;
+      if (P2.slot === slot) return true;
+
+      var ok = false;
+      if (typeof g.setSlot === 'function') {
+        try { g.setSlot(slot); ok = true; } catch (e) {}
+      } else if (typeof g.switchSlot === 'function') {
+        try { g.switchSlot(slot); ok = true; } catch (e) {}
+      }
+
+      if (!ok) {
+        try {
+          if (P2.slot !== slot) P2.lastSlot = P2.slot > 10 ? P2.slot - 10 : P2.slot;
+          if (P2.fpMixer && P2.fpMixer.stopAllAction) P2.fpMixer.stopAllAction();
+          P2.slot = slot;
+          mqqSyncSlotOnce(P2, slot);
+          var newW = P2.inv[slot] && P2.inv[slot].w;
+          if (newW && P2.s && P2.s.equip) { try { P2.s.equip(newW); } catch (e) {} }
+        } catch (e) {}
+      } else {
+        setTimeout(function () {
+          try {
+            var g2 = G || game();
+            if (g2 && g2.P && g2.P.slot === slot) mqqSyncSlotOnce(g2.P, slot);
+          } catch (e) {}
+        }, 0);
+      }
+
+      if (antiFire) {
+        try { P2.yt = false; } catch (e) {}
+        try { P2.trigger = false; } catch (e) {}
+        try { P2.pinning = false; } catch (e) {}
+        try { P2.burstLeft = 0; } catch (e) {}
+        try { P2.shotT = 0; } catch (e) {}
+        try { P2.nextShot = performance.now() / 1000 + 0.4; } catch (e) {}
+        try { P2.swapEnd = 0; } catch (e) {}
+      }
+
+      return true;
+    }
+
+    function mqqTrigger() {
+      if (!MQQ.on || MQQ.busy) return;
+      var g = G || game();
+      if (!g || !g.P || !g.P.s || g.P.s.dead) return;
+      var P2 = g.P;
+
+      var W = P2.W;
+      if (!W || W.melee || W.grenade || W.c4 || W.throwKnife) return;
+
+      if (MQQ.meleeSlot < 0) {
+        if (!mqqDetectSlots()) return;
+      }
+      if (!mqqMeleeOk()) return;
+      if (P2.slot === MQQ.meleeSlot) return;
+
+      var slotAsal = P2.slot;
+      if (slotAsal === 1 || slotAsal === 2) {
+        MQQ.activePrimarySlot = slotAsal;
+      } else {
+        var fallback = mqqResolvePrimary(P2);
+        if (fallback < 0) return;
+        MQQ.activePrimarySlot = fallback;
+        slotAsal = fallback;
+      }
+
+      var now = performance.now();
+      if (now < MQQ.guardUntil) {
+        MQQ.pendingTrigger = 1;
+        return;
+      }
+      if (now < MQQ.freezeUntil) {
+        MQQ.pendingTrigger = 1;
+        return;
+      }
+      if (now - MQQ.lastFireT < 40) {
+        MQQ.pendingTrigger = 1;
+        return;
+      }
+
+      MQQ.pendingTrigger = 0;
+      MQQ.lastFireT = now;
+      MQQ.busy = 1;
+      var mySeq = ++MQQ.seq;
+
+      var okSwap = mqqAt(MQQ.meleeSlot, true);
+      if (!okSwap) {
+        MQQ.busy = 0;
+        return;
+      }
+
+      MQQ.freezeUntil = now + 250;
+
+      setTimeout(function () {
+        if (mySeq !== MQQ.seq) { MQQ.busy = 0; return; }
+        var g2 = G || game();
+        if (!g2 || !g2.P || !g2.P.s || g2.P.s.dead) { MQQ.busy = 0; return; }
+        var P3 = g2.P;
+
+        try { P3.yt = false; } catch (e) {}
+        try { P3.trigger = false; } catch (e) {}
+        try { P3.nextShot = performance.now() / 1000 + 0.4; } catch (e) {}
+        try { P3.pinning = false; } catch (e) {}
+        try { P3.burstLeft = 0; } catch (e) {}
+        try { P3.swapEnd = 0; } catch (e) {}
+
+        if (P3.slot === MQQ.meleeSlot) {
+          mqqSyncSlotOnce(P3, MQQ.meleeSlot);
+          if (P3.fpActs && P3.fpActs.idle) {
+            try {
+              P3.fpActs.idle.timeScale = 1;
+              P3.fpActs.idle.setEffectiveWeight(1);
+              if (!P3.fpActs.idle.isRunning()) P3.fpActs.idle.play();
+            } catch (e) {}
+          }
+        }
+
+        setTimeout(function () {
+          if (mySeq !== MQQ.seq) { MQQ.busy = 0; return; }
+          var g3 = G || game();
+          if (!g3 || !g3.P || !g3.P.s || g3.P.s.dead) { MQQ.busy = 0; return; }
+          var P4 = g3.P;
+
+          var target = mqqPrimaryOk(slotAsal) ? slotAsal : mqqResolvePrimary(P4);
+          if (target < 0) { MQQ.busy = 0; return; }
+
+          mqqAt(target, false);
+
+          setTimeout(function () {
+            if (mySeq !== MQQ.seq) { MQQ.busy = 0; return; }
+            try {
+              var g4 = G || game();
+              if (g4 && g4.P) {
+                var P5 = g4.P;
+                P5.swapEnd = 0;
+                P5.nextShot = 0;
+                P5.trigger = false;
+                P5.pinning = false;
+                mqqSyncSlotOnce(P5, P5.slot);
+              }
+            } catch (e) {}
+            MQQ.qqCount++;
+            MQQ.busy = 0;
+            MQQ.guardUntil = performance.now() + 60;
+          }, MQQ.tSettlePrimary);
+        }, MQQ.tReturnDelay);
+      }, MQQ.tSettleMelee);
+    }
+
+    function mqqTick() {
+      requestAnimationFrame(mqqTick);
+      if (!MQQ.on) return;
+      var g = G || game();
+      if (!g || !g.P || !g.P.s || g.P.s.dead) {
+        MQQ.ammoPeak = -1;
+        MQQ.lastSlot = 0;
+        MQQ.activePrimarySlot = -1;
+        MQQ.lastSyncedSlot = -1;
+        MQQ.pendingTrigger = 0;
+        MQQ.ytPrev = false;
+        MQQ.trigPrev = false;
+        MQQ.lastShotSig = '';
+        return;
+      }
+      var P2 = g.P;
+
+      if (P2.slot !== MQQ.lastSlot) {
+        MQQ.lastSlot = P2.slot;
+        MQQ.ammoPeak = (typeof P2.ammo === 'number') ? P2.ammo : -1;
+        MQQ.lastSyncedSlot = -1;
+        if (MQQ.meleeSlot < 0) mqqDetectSlots();
+        return;
+      }
+
+      if (P2.slot !== 1 && P2.slot !== 2) {
+        MQQ.ammoPeak = (typeof P2.ammo === 'number') ? P2.ammo : -1;
+        MQQ.ytPrev = false;
+        MQQ.trigPrev = false;
+        return;
+      }
+
+      var ammo = (typeof P2.ammo === 'number') ? P2.ammo : -1;
+      var busy = MQQ.busy || performance.now() < MQQ.freezeUntil;
+
+      var ammoDropped = false;
+      if (MQQ.ammoPeak < 0) {
+        MQQ.ammoPeak = ammo;
+      } else if (ammo >= 0 && ammo < MQQ.ammoPeak) {
+        ammoDropped = true;
+        MQQ.ammoPeak = ammo;
+      } else if (ammo > MQQ.ammoPeak + 2) {
+        MQQ.ammoPeak = ammo;
+      } else if (ammo > MQQ.ammoPeak) {
+        MQQ.ammoPeak = ammo;
+      }
+
+      var ytNow = !!P2.yt;
+      var trigNow = !!P2.trigger;
+      var ytEdge = (MQQ.ytPrev && !ytNow);
+      var trigEdge = (MQQ.trigPrev && !trigNow);
+      MQQ.ytPrev = ytNow;
+      MQQ.trigPrev = trigNow;
+
+      var sigParts = [];
+      try { sigParts.push('s' + (P2.shotT || 0)); } catch (e) {}
+      try { sigParts.push('c' + (P2.shotCount || 0)); } catch (e) {}
+      try { sigParts.push('f' + (P2.fireCount || 0)); } catch (e) {}
+      var sig = sigParts.join('|');
+      var sigChanged = (MQQ.lastShotSig && sig !== MQQ.lastShotSig);
+      MQQ.lastShotSig = sig;
+
+      var triggered = ammoDropped || ytEdge || trigEdge || sigChanged;
+
+      if (!triggered) {
+        if (MQQ.pendingTrigger && !busy) {
+          MQQ.pendingTrigger = 0;
+          mqqTrigger();
+        }
+        return;
+      }
+
+      if (busy) {
+        MQQ.pendingTrigger = 1;
+        return;
+      }
+
+      MQQ.pendingTrigger = 0;
+      mqqTrigger();
+    }
+    try { requestAnimationFrame(mqqTick); } catch (e) {}
 
     var PR = { on: 0, ms: 120 };
     var RF = { on: 0, last: 0 };
@@ -1709,7 +2098,7 @@
     }
     try { requestAnimationFrame(tbTick); } catch (e) {}
 
-    var SA = { on: 0, fovRad: Math.PI / 3 };
+    var SA = { on: 0, fovRad: Math.PI };
     var SA_HEAD = { x: 0, y: 0, z: 0, bot: null, validUntil: 0 };
 
     function getTHREE() {
@@ -1745,9 +2134,11 @@
           var pd = Math.sqrt(pdx*pdx + pdy*pdy + pdz*pdz);
           if (pd < P.reach + 50) {
             var pdot = (pdx*fx + pdy*fy + pdz*fz) / pd;
-            if (Math.acos(clamp(pdot, -1, 1)) < SA.fovRad) {
+            var pang = Math.acos(clamp(pdot, -1, 1));
+            // 360°: prev target selalu eligible selama FOV izinkan
+            if (pang <= SA.fovRad) {
               best = prev;
-              bestScore = pd * 0.5;
+              bestScore = pd * 0.5 + pang * 20;
             }
           }
         }
@@ -1762,8 +2153,9 @@
         if (d < 1.5 || d > P.reach + 50) continue;
         var dot = (dx*fx + dy*fy + dz*fz) / d;
         var ang = Math.acos(clamp(dot, -1, 1));
-        if (ang > SA.fovRad) continue;
-        var score = ang * 100 + d * 0.3;
+        // 360°: tidak filter ang > fovRad — semua arah eligible
+        // Skor: sudut lebih kecil = prioritas, tapi target dekat tetap kompetitif
+        var score = ang * 20 + d * 0.5;
         if (score < bestScore) {
           bestScore = score;
           best = p;
@@ -2014,7 +2406,7 @@
       instScope: function (on) { IS.on = on ? 1 : 0; return IS.on; },
       trig: function (on) { TB.on = on ? 1 : 0; return TB.on; },
       silent: function (on) { SA.on = on ? 1 : 0; saPatch(); return SA.on; },
-      silentFov: function (deg) { if (typeof deg === 'number' && deg > 0 && deg < 180) SA.fovRad = deg * Math.PI / 180; return SA.fovRad * 180 / Math.PI; },
+      silentFov: function (deg) { if (typeof deg === 'number' && deg > 0 && deg <= 360) SA.fovRad = deg * Math.PI / 180; return SA.fovRad * 180 / Math.PI; },
       lob: function (on) { SL.on = on ? 1 : 0; return SL.on; },
       respawn: function (on) { IR.on = on ? 1 : 0; return IR.on; },
       radar: function (on) { RD.on = on ? 1 : 0; if (!on && RD.el) RD.el.style.display = 'none'; return RD.on; },
@@ -2071,6 +2463,65 @@
         };
       },
 
+      autoQQ: function (on) {
+        MQQ.on = on ? 1 : 0;
+        MQQ.fast = on ? 1 : 0;
+        if (!MQQ.on) {
+          MQQ.busy = 0;
+          MQQ.seq++;
+          MQQ.freezeUntil = 0;
+          MQQ.guardUntil = 0;
+          MQQ.lastSyncedSlot = -1;
+          MQQ.pendingTrigger = 0;
+        }
+        return MQQ.on;
+      },
+      autoQQPrimary: function (slot) {
+        if (slot === 1 || slot === 2) {
+          MQQ.primarySlot = slot;
+          try { localStorage.setItem('ir_qq_primary', String(slot)); } catch (e) {}
+        }
+        return MQQ.primarySlot;
+      },
+      autoQQSt: function () {
+        return {
+          on: MQQ.on,
+          fast: MQQ.fast,
+          busy: MQQ.busy,
+          qqCount: MQQ.qqCount,
+          meleeSlot: MQQ.meleeSlot,
+          primarySlot: MQQ.primarySlot,
+          activePrimarySlot: MQQ.activePrimarySlot,
+          pending: MQQ.pendingTrigger,
+          tSettleMelee: MQQ.tSettleMelee,
+          tReturnDelay: MQQ.tReturnDelay,
+          tSettlePrimary: MQQ.tSettlePrimary,
+          cycleMs: MQQ.tSettleMelee + MQQ.tReturnDelay + MQQ.tSettlePrimary
+        };
+      },
+      autoQQTiming: function (a, b, c) {
+        if (typeof a === 'number' && a >= 5 && a <= 200) MQQ.tSettleMelee = a;
+        if (typeof b === 'number' && b >= 5 && b <= 200) MQQ.tReturnDelay = b;
+        if (typeof c === 'number' && c >= 5 && c <= 200) MQQ.tSettlePrimary = c;
+        mqqSaveTiming();
+        return { m: MQQ.tSettleMelee, r: MQQ.tReturnDelay, p: MQQ.tSettlePrimary };
+      },
+      autoQQPreset: function (name) {
+        var presets = {
+          ultra: { m: 12, r: 8,  p: 6  },
+          fast:  { m: 18, r: 12, p: 8  },
+          medium:{ m: 30, r: 20, p: 12 },
+          safe:  { m: 50, r: 35, p: 20 }
+        };
+        var pr = presets[name];
+        if (!pr) return null;
+        MQQ.tSettleMelee = pr.m;
+        MQQ.tReturnDelay = pr.r;
+        MQQ.tSettlePrimary = pr.p;
+        mqqSaveTiming();
+        return pr;
+      },
+
       st: function () {
         return {
           pred: PR.on, rapid: RF.on, instScope: IS.on,
@@ -2085,6 +2536,9 @@
           infNade: FL.infNade, infNadeMax: FL.infNadeMax,
           silentNade: SN.on, silentNadeBypass: SNB.on,
           espName: E.nameOn,
+          autoQQ: MQQ.on, autoQQFast: MQQ.fast, autoQQBusy: MQQ.busy,
+          autoQQPrimary: MQQ.primarySlot, autoQQActivePrimary: MQQ.activePrimarySlot,
+          autoQQMelee: MQQ.meleeSlot, autoQQCount: MQQ.qqCount,
           saHead: SA_HEAD.bot ? {
             x: +SA_HEAD.x.toFixed(2),
             y: +SA_HEAD.y.toFixed(2),
@@ -2227,6 +2681,7 @@
         '  color:#92400e;font-size:9px;line-height:1.25}',
         '.fk-sa-tgt{font-size:9px;color:#10b981;padding:2px 6px;margin-top:3px;background:#ecfdf5;border-radius:4px;border:1px solid #6ee7b7}',
         '.fk-nade-st{font-size:9px;color:#7c3aed;padding:2px 6px;margin-top:3px;background:#f5f3ff;border-radius:4px;border:1px solid #c4b5fd;line-height:1.35}',
+        '.fk-qq-st{font-size:9px;color:#0ea5e9;padding:2px 6px;margin-top:3px;background:#f0f9ff;border-radius:4px;border:1px solid #7dd3fc;line-height:1.35}',
         '#ir-fps-ms{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:2147483605;background:rgba(0,0,0,0.6);color:#00ffcc;padding:3px 8px;border-radius:6px;font:700 11px monospace;pointer-events:none;box-shadow:0 2px 6px rgba(0,0,0,0.3)}',
         '#ir-float-eye{position:fixed;top:8px;right:8px;z-index:2147483606;background:rgba(124,58,237,0.20);color:rgba(255,255,255,0.75);width:28px;height:28px;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.25);font-size:11px;transition:all .15s}',
         '#ir-float-eye:hover{background:rgba(124,58,237,0.7);color:#fff}'
@@ -2403,6 +2858,7 @@
         noclip: { icon: 'fa-ghost',         label: 'NOCLIP', title: 'Noclip' },
         nade:   { icon: 'fa-bomb',          label: 'NADE',   title: 'Grenade' },
         move:   { icon: 'fa-feather',       label: 'MOVE',   title: 'Movement' },
+        macro:  { icon: 'fa-bolt',          label: 'MACRO',  title: 'Makro Auto QQ' },
         misc:   { icon: 'fa-sliders',       label: 'MISC',   title: 'Misc' },
         info:   { icon: 'fa-circle-info',   label: 'INFO',   title: 'Info' }
       };
@@ -2520,8 +2976,8 @@
       var pSil = addTab('silent', 'SILENT');
       pSil.appendChild(sec('fa-crosshairs', 'Silent Aim'));
       var saT = toggle('silent_aim', false, function (on) { window.__pbx.silent(on); });
-      pSil.appendChild(rowRisk('Silent aim', saT.node, 'Peluru auto ke kepala'));
-      var saFovS = slider(30, 170, 5, SA.fovRad * 180 / Math.PI, function (v) { return v.toFixed(0) + '°'; }, function (v) { window.__pbx.silentFov(v); });
+      pSil.appendChild(rowRisk('Silent aim', saT.node, 'Peluru auto ke kepala (360°)'));
+      var saFovS = slider(30, 360, 5, SA.fovRad * 180 / Math.PI, function (v) { return v.toFixed(0) + '°'; }, function (v) { window.__pbx.silentFov(v); });
       saFovS.label.textContent = 'Silent FOV'; pSil.appendChild(saFovS.node);
       var saTgt = el('div', 'fk-sa-tgt', 'target: —');
       pSil.appendChild(saTgt);
@@ -2559,7 +3015,7 @@
       var flyT = toggle('fly_on', false, function (on) { window.__pbx.fly(on); });
       pFly.appendChild(rowRisk('Fly', flyT.node, 'Hold jump = naik'));
       var flyBypassT = toggle('fly_bypass', false, function (on) { window.__pbx.flyBypass(on); });
-      pFly.appendChild(rowRisk('Fly bypass', flyT.node, 'Anti deteksi fly'));
+      pFly.appendChild(rowRisk('Fly bypass', flyBypassT.node, 'Anti deteksi fly'));
       var flyModeSel = el('select', 'fk-select');
       flyModeSel.innerHTML =
         '<option value="jump">Jump</option>' +
@@ -2602,7 +3058,111 @@
       var noFallT = toggle('no_fall', false, function (on) { window.__pbx.noFall(on); });
       pMove.appendChild(row('No fall damage', noFallT.node, 'Tidak mati jatuh'));
 
+      /* ===== TAB MACRO ===== */
+      var pMacro = addTab('macro', 'MACRO');
+      pMacro.appendChild(sec('fa-bolt', 'Makro Auto QQ'));
+      var qqT = toggle('auto_qq', false, function (on) {
+        window.__pbx.autoQQ(on);
+      });
+      pMacro.appendChild(rowNew('Auto QQ', qqT.node, 'Ammo keluar → melee → slot utama (fast)'));
+
+      var qqPrimarySel = el('select', 'fk-select');
+      qqPrimarySel.innerHTML =
+        '<option value="1">Slot 1 (Primer)</option>' +
+        '<option value="2">Slot 2 (Sekunder)</option>';
+      try {
+        var savedPrimary = localStorage.getItem('ir_qq_primary');
+        qqPrimarySel.value = (savedPrimary === '2') ? '2' : '1';
+        MQQ.primarySlot = qqPrimarySel.value === '2' ? 2 : 1;
+      } catch (e) { qqPrimarySel.value = '1'; MQQ.primarySlot = 1; }
+      qqPrimarySel.addEventListener('change', function () {
+        window.__pbx.autoQQPrimary(+this.value);
+      });
+      var qqPrimaryRow = el('div', 'fk-slider');
+      qqPrimaryRow.style.cssText = 'padding:2px 0;display:flex;align-items:center;gap:6px';
+      var qqPrimaryLbl = el('label', null, 'Swap ke');
+      qqPrimaryLbl.style.cssText = 'flex:0 0 80px;font-size:10px;color:#334155';
+      qqPrimarySel.style.cssText = 'flex:1;margin-top:0';
+      qqPrimaryRow.appendChild(qqPrimaryLbl);
+      qqPrimaryRow.appendChild(qqPrimarySel);
+      pMacro.appendChild(qqPrimaryRow);
+
+      var qqPresetSel = el('select', 'fk-select');
+      qqPresetSel.innerHTML =
+        '<option value="ultra">Ultra (26ms) — melee nyaris invisible</option>' +
+        '<option value="fast">Fast (38ms) — default, stabil</option>' +
+        '<option value="medium">Medium (62ms) — melee kelihatan tipis</option>' +
+        '<option value="safe">Safe (105ms) — paling aman, melee kelihatan</option>';
+      qqPresetSel.value = 'fast';
+      qqPresetSel.addEventListener('change', function () {
+        try { window.__pbx.autoQQPreset(this.value); syncQqTiming(); } catch (e) {}
+      });
+      var qqPresetRow = el('div', 'fk-slider');
+      qqPresetRow.style.cssText = 'padding:2px 0;display:flex;align-items:center;gap:6px';
+      var qqPresetLbl = el('label', null, 'Preset');
+      qqPresetLbl.style.cssText = 'flex:0 0 80px;font-size:10px;color:#334155';
+      qqPresetSel.style.cssText = 'flex:1;margin-top:0';
+      qqPresetRow.appendChild(qqPresetLbl);
+      qqPresetRow.appendChild(qqPresetSel);
+      pMacro.appendChild(qqPresetRow);
+
+      var qqMeleeS = slider(5, 200, 1, MQQ.tSettleMelee,
+        function (v) { return v.toFixed(0) + 'ms'; },
+        function (v) {
+          MQQ.tSettleMelee = v;
+          try { window.__pbx.autoQQTiming(MQQ.tSettleMelee, MQQ.tReturnDelay, MQQ.tSettlePrimary); } catch (e) {}
+          updateQqCycleLabel();
+        });
+      qqMeleeS.label.textContent = 'Melee settle';
+      pMacro.appendChild(qqMeleeS.node);
+
+      var qqRetS = slider(5, 200, 1, MQQ.tReturnDelay,
+        function (v) { return v.toFixed(0) + 'ms'; },
+        function (v) {
+          MQQ.tReturnDelay = v;
+          try { window.__pbx.autoQQTiming(MQQ.tSettleMelee, MQQ.tReturnDelay, MQQ.tSettlePrimary); } catch (e) {}
+          updateQqCycleLabel();
+        });
+      qqRetS.label.textContent = 'Return delay';
+      pMacro.appendChild(qqRetS.node);
+
+      var qqPriS = slider(5, 200, 1, MQQ.tSettlePrimary,
+        function (v) { return v.toFixed(0) + 'ms'; },
+        function (v) {
+          MQQ.tSettlePrimary = v;
+          try { window.__pbx.autoQQTiming(MQQ.tSettleMelee, MQQ.tReturnDelay, MQQ.tSettlePrimary); } catch (e) {}
+          updateQqCycleLabel();
+        });
+      qqPriS.label.textContent = 'Primary settle';
+      pMacro.appendChild(qqPriS.node);
+
+      var qqCycleLbl = el('div', 'fk-qq-st', 'cycle: 38ms');
+      qqCycleLbl.style.fontSize = '9px';
+      qqCycleLbl.style.padding = '2px 6px';
+      pMacro.appendChild(qqCycleLbl);
+
+      function updateQqCycleLabel() {
+        try {
+          var total = MQQ.tSettleMelee + MQQ.tReturnDelay + MQQ.tSettlePrimary;
+          qqCycleLbl.textContent = 'cycle: ' + total.toFixed(0) + 'ms ('
+            + MQQ.tSettleMelee.toFixed(0) + '/' + MQQ.tReturnDelay.toFixed(0) + '/' + MQQ.tSettlePrimary.toFixed(0) + ')';
+        } catch (e) {}
+      }
+      function syncQqTiming() {
+        try {
+          qqMeleeS.set(MQQ.tSettleMelee);
+          qqRetS.set(MQQ.tReturnDelay);
+          qqPriS.set(MQQ.tSettlePrimary);
+          updateQqCycleLabel();
+        } catch (e) {}
+      }
+      updateQqCycleLabel();
+
+      var qqStat = el('div', 'fk-qq-st', 'auto QQ: off');
+      pMacro.appendChild(qqStat);
+
       var pMisc = addTab('misc', 'MISC');
+
       pMisc.appendChild(sec('fa-right-left', 'Quick Swap'));
       var qcT = toggle('quick_swap', false, function (on) { if (on) window.__pbqc.on(); else window.__pbqc.off(); });
       pMisc.appendChild(row('Quick swap', qcT.node, 'Ganti senjata instan'));
@@ -2642,7 +3202,10 @@
         '<div>Fly bypass: throttle + stealth write</div>' +
         '<div>Silent nade bypass: rAF chase</div>' +
         '<div>Aimbot: POV + LOS realtime (80ms)</div>' +
-        '<div>ESP: 0ms Delay & GPU Accel</div>';
+        '<div>ESP: 0ms Delay & GPU Accel</div>' +
+        '<div>Auto QQ: pattern 1-3-1 / 2-3-2 (pilih slot)</div>' +
+        '<div>Silent aim: 360° FOV + hitTest rewrite</div>' +
+        '<div>Instant swap: nextShot gate + anim skip</div>';
       pInfo.appendChild(bypassInfo);
 
       pInfo.appendChild(sec('fa-triangle-exclamation', 'Danger'));
@@ -2654,6 +3217,7 @@
           for(var i=0; i<keys.length; i++) {
             if(keys[i].indexOf('iril_tg_') === 0) localStorage.removeItem(keys[i]);
           }
+          try { localStorage.removeItem('ir_qq_primary'); } catch (e) {}
           window.__pb.off(); window.__pbvis.off();
           window.__pbqc.off(); window.__pbqc.cfg({ fast: 0 });
           window.__pbx.pred(0); window.__pbx.rapid(0);
@@ -2668,7 +3232,7 @@
           window.__pb.hitbox('head');
           window.__pb.bulletSpeed(350);
           window.__pb.leadFactor(1.0);
-          window.__pbx.silentFov(120);
+          window.__pbx.silentFov(180);
           window.__pb.lockMode('pov');
           window.__pbx.fly(false); window.__pbx.flyMode('jump');
           window.__pbx.flyBypass(0);
@@ -2676,6 +3240,16 @@
           window.__pbx.silentNadeBypass(0);
           window.__pbx.infNade(0); window.__pbx.infNadeMax(99);
           window.__pbx.noFall(0);
+          window.__pbx.autoQQ(0);
+          window.__pbx.autoQQPrimary(1);
+          try { MQQ.primarySlot = 1; if (qqPrimarySel) qqPrimarySel.value = '1'; } catch (e) {}
+          try { MQQ.lastSyncedSlot = -1; MQQ.freezeUntil = 0; MQQ.guardUntil = 0; MQQ.pendingTrigger = 0; } catch (e) {}
+          try {
+            MQQ.tSettleMelee = 18; MQQ.tReturnDelay = 12; MQQ.tSettlePrimary = 8;
+            if (typeof mqqSaveTiming === 'function') mqqSaveTiming();
+            if (qqPresetSel) qqPresetSel.value = 'fast';
+            if (typeof syncQqTiming === 'function') syncQqTiming();
+          } catch (e) {}
           syncAll();
         } catch (e) {}
       });
@@ -2699,7 +3273,8 @@
           foot.textContent = parts.join(' · ');
           statBox.textContent = 'bots ' + s2.bots + ' · fire ' + s2.fire + ' · fly ' + (FLY.on ? '✓' : '✕') +
             ' · noclip ' + (FL.noclip ? '✓' : '✕') + ' · snade ' + (SN.on ? SN.nadeCount : '✕') +
-            ' · infNade ' + (FL.infNade ? '✓' : '✕');
+            ' · infNade ' + (FL.infNade ? '✓' : '✕') + ' · QQ ' + (MQQ.on ? MQQ.qqCount : '✕') +
+            ' · Iswap ' + (QC.on ? QC.sw : '✕');
 
           if (window.__pbx) {
             var x2 = window.__pbx.st();
@@ -2728,6 +3303,18 @@
               } else {
                 infNadeSt.textContent = 'unlimited: ' + (ngs.on ? 'ON' : 'OFF') + ' · belum ada granat';
               }
+            }
+            if (qqStat) {
+              var qs = window.__pbx.autoQQSt();
+              var pattern = qs.activePrimarySlot > 0
+                ? qs.activePrimarySlot + '-' + (qs.meleeSlot >= 0 ? qs.meleeSlot : '3') + '-' + qs.activePrimarySlot
+                : '—';
+              qqStat.textContent = 'auto QQ: ' + (qs.on ? 'ON' : 'OFF') +
+                ' · primary: slot ' + (qs.primarySlot >= 0 ? qs.primarySlot : '?') +
+                ' · pattern: ' + pattern +
+                ' · swaps: ' + qs.qqCount +
+                (qs.busy ? ' · busy' : '') +
+                (qs.pending ? ' · pending' : '');
             }
           }
         } catch (e) { foot.textContent = '…'; }
@@ -2774,6 +3361,19 @@
             try { snadeBypassT.set(!!x.silentNadeBypass); } catch (e) {}
             try { infNadeT.set(!!x.infNade); infNadeMaxS.set(x.infNadeMax); } catch (e) {}
             try { espNameT.set(!!x.espName); } catch (e) {}
+            try { qqT.set(!!x.autoQQ); } catch (e) {}
+            try {
+              if (qqPrimarySel) {
+                var pv = (MQQ.primarySlot === 2) ? '2' : '1';
+                if (qqPrimarySel.value !== pv) qqPrimarySel.value = pv;
+              }
+            } catch (e) {}
+            try {
+              if (qqMeleeS) qqMeleeS.set(MQQ.tSettleMelee);
+              if (qqRetS) qqRetS.set(MQQ.tReturnDelay);
+              if (qqPriS) qqPriS.set(MQQ.tSettlePrimary);
+              updateQqCycleLabel();
+            } catch (e) {}
           }
         } catch (e) {}
       }

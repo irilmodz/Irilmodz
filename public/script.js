@@ -121,7 +121,7 @@
   }
 
   function bootCore() {
-    var V = '3.5.2';
+    var V = '3.5.4';
     var BRAND = 'iRiLLL MODZ';
     function log() { try { console.log.apply(console, ['[iR]'].concat([].slice.call(arguments))); } catch (e) {} }
 
@@ -329,7 +329,8 @@
         if (!DBG.el) {
           var d = document.createElement('div');
           d.setAttribute('data-pb', '1');
-          d.style.cssText = 'position:fixed;left:6px;bottom:6px;padding:2px 6px;background:#000a;color:#fff;font:11px monospace;z-index:2147483000;pointer-events:none;border-radius:2px';
+          /* TEKS POJOK KIRI BAWAH — WARNA UNGU */
+          d.style.cssText = 'position:fixed;left:6px;bottom:6px;padding:2px 7px;background:rgba(20,8,38,.75);color:#c084fc;font:700 10px monospace;z-index:2147483000;pointer-events:none;border-radius:3px;border:1px solid rgba(168,85,247,.45);text-shadow:0 0 6px rgba(168,85,247,.8)';
           (document.body || document.documentElement).appendChild(d);
           DBG.el = d;
         }
@@ -560,7 +561,6 @@
       holding = false;
     }
 
-    // PENGATURAN MOUSE & TOUCH: HANYA MENDETEKSI MOUSE ATAU TOMBOL TEMBAK ASLI GAME
     addEventListener('mousemove', function (e) {
       if (e.movementX || e.movementY) aimWrite(e.movementX, e.movementY);
     }, true);
@@ -577,12 +577,9 @@
       if (document.hidden) { fireHeld = 0; st.fire = 0; }
     });
 
-    // SISTEM PENCARIAN OTOMATIS TOMBOL TEMBAK ASLI GAME (HTML / UI GAME)
-    // Script akan otomatis mencari elemen tombol tembak game (berdasarkan id/class/atribut bawaan game)
     var fireElementBound = false;
     function bindRealFireButton() {
       if (fireElementBound) return;
-      // Mencari tombol tembak umum di game web/mobile HTML
       var fireBtnSelectors = [
         '#fire', '#btn-fire', '.btn-fire', '[data-action="fire"]', '[class*="fire"]', '[id*="fire"]',
         '#shoot', '#btn-shoot', '.btn-shoot', '[data-action="shoot"]', '[class*="shoot"]', '[id*="shoot"]'
@@ -1074,7 +1071,7 @@
       aimFlush(g);
     }
 
-    setInterval(function () { try { var g = G || game(); if (g) aimFlush(g); } catch (e) {} }, 16);
+    setInterval(function () { try { var g = G || game(); if (g) aimFlush(g); } catch (e) {} }, 33);
 
     setInterval(function () {
       try {
@@ -1150,7 +1147,7 @@
     };
     window.__pb = PB_API; HIDDEN.pb = PB_API;
 
-    /* ===== ULTRA FAST & LIGHT ESP ===== */
+    /* ===== ESP ===== */
     var E = { on: 0, wrap: null, host: null, hostRect: null, hostAt: 0, slots: [], last: 0, n: 0 };
     function eInit() {
       if (E.wrap && E.wrap.parentNode) return true;
@@ -1163,24 +1160,27 @@
     function eSlot(i) {
       var s = E.slots[i]; if (s) return s;
       var box = document.createElement('div');
-      box.style.cssText = 'position:absolute;left:0;top:0;box-sizing:border-box;border:1px solid rgba(255,255,255,0.45);border-radius:2px;display:none;will-change:transform,width,height;background:rgba(255,255,255,0.02)';
+      box.style.cssText = 'position:absolute;left:0;top:0;box-sizing:border-box;border:1.5px solid rgba(168,85,247,0.9);border-radius:2px;display:none;will-change:transform,width,height;box-shadow:0 0 4px rgba(168,85,247,0.5)';
       
       var hb = document.createElement('div');
-      hb.style.cssText = 'position:absolute;left:-1px;top:-4px;width:calc(100% + 2px);height:2px;background:rgba(0,0,0,0.4);border-radius:1px;overflow:hidden';
+      hb.style.cssText = 'position:absolute;left:-1.5px;top:-5px;width:calc(100% + 3px);height:3px;background:rgba(0,0,0,0.55);border-radius:1px;overflow:hidden;border:1px solid rgba(168,85,247,0.4)';
       
       var hf = document.createElement('div');
-      hf.style.cssText = 'position:absolute;left:0;top:0;height:100%;width:100%;background:#38bdf8';
+      hf.style.cssText = 'position:absolute;left:0;top:0;height:100%;width:100%;background:#a855f7;transition:width .08s linear';
       hb.appendChild(hf);
       
       var tx = document.createElement('div');
-      tx.style.cssText = 'position:absolute;right:2px;top:-13px;font:9px/10px system-ui,sans-serif;color:#f8fafc;text-shadow:0 1px 1px rgba(0,0,0,0.9);white-space:nowrap;font-weight:600';
+      tx.style.cssText = 'position:absolute;right:2px;top:-14px;font:700 9px/9px system-ui,sans-serif;color:#fff;text-shadow:0 0 3px #000,0 1px 1px #000;white-space:nowrap';
       
       var nameEl = document.createElement('div');
-      nameEl.style.cssText = 'position:absolute;left:50%;top:-22px;transform:translateX(-50%);font:9px/10px system-ui,sans-serif;color:#e2e8f0;text-shadow:0 1px 1px rgba(0,0,0,0.9);white-space:nowrap;font-weight:700;display:none';
+      nameEl.style.cssText = 'position:absolute;left:50%;top:-24px;transform:translateX(-50%);font:800 10px/10px system-ui,sans-serif;color:#e9d5ff;text-shadow:0 0 5px #7c3aed,0 1px 1px #000;white-space:nowrap;display:none';
       
-      box.appendChild(hb); box.appendChild(tx); box.appendChild(nameEl);
+      var hpTxt = document.createElement('div');
+      hpTxt.style.cssText = 'position:absolute;right:-40px;top:-2px;font:800 10px/10px system-ui,sans-serif;color:#fff;text-shadow:0 0 3px #000,0 1px 1px #000;white-space:nowrap;display:none';
+      
+      box.appendChild(hb); box.appendChild(tx); box.appendChild(nameEl); box.appendChild(hpTxt);
       E.wrap.appendChild(box); 
-      s = { box: box, hp: hf, tx: tx, name: nameEl, lastX: 0, lastY: 0, lastW: 0, lastH: 0 }; 
+      s = { box: box, hp: hf, tx: tx, name: nameEl, hpTxt: hpTxt, lastX: 0, lastY: 0, lastW: 0, lastH: 0 }; 
       E.slots[i] = s; 
       return s;
     }
@@ -1192,7 +1192,7 @@
     }
     function eHost() {
       var now = performance.now();
-      if (E.host && E.host.parentNode && now - E.hostAt < 1000) return E.host;
+      if (E.host && E.host.parentNode && now - E.hostAt < 2000) return E.host;
       E.hostAt = now;
       var best = null, ba = 0, cs = document.getElementsByTagName('canvas');
       for (var i = 0; i < cs.length; i++) {
@@ -1220,6 +1220,9 @@
       var me = cam.matrixWorld && cam.matrixWorld.elements;
       var cx = me ? me[12] : 0, cy = me ? me[13] : 0, cz = me ? me[14] : 0;
       var my = self.team, idx = 0;
+      var now = performance.now();
+      var slow = (now - (E._slow || 0) > 200);
+      if (slow) E._slow = now;
       
       for (var i = 0; i < list.length; i++) {
         var p = list[i];
@@ -1227,7 +1230,8 @@
         if (!p.obj || p.obj.visible === false || !p.obj.parent) continue;
         
         var hp = headPoint(p); if (!hp) continue;
-        var mm = p.obj.matrixWorld && p.obj.matrixWorld.elements; if (!mm) continue;
+        var mw = p.obj.matrixWorld; if (!mw) continue;
+        var mm = mw.elements; if (!mm) continue;
         
         var a = eProj(cam, r, hp.x, hp.y, hp.z);
         var b = eProj(cam, r, mm[12], mm[13], mm[14]);
@@ -1236,7 +1240,7 @@
         var bh = b.y - a.y; if (!(bh > 6)) continue;
         if (a.x < r.left - 40 || a.x > r.left + r.width + 40 || b.y < r.top - 40 || a.y > r.top + r.height + 40) continue;
         
-        var bw = bh * 0.40; if (bw > 300) bw = 300;
+        var bw = bh * 0.42; if (bw > 300) bw = 300;
         
         var s = eSlot(idx++);
         var posX = +(a.x - bw / 2).toFixed(1);
@@ -1256,17 +1260,20 @@
         var mxh = p.maxHp > 0 ? p.maxHp : 100;
         var f = Math.max(0, Math.min(1, (p.hp || 0) / mxh));
         s.hp.style.width = (f * 100).toFixed(0) + '%';
-        s.hp.style.background = f > 0.5 ? '#38bdf8' : (f > 0.25 ? '#fbbf24' : '#f87171');
+        s.hp.style.background = f > 0.5 ? '#a855f7' : (f > 0.25 ? '#fbbf24' : '#ef4444');
         
-        var dx = hp.x - cx, dy = hp.y - cy, dz = hp.z - cz;
-        s.tx.textContent = Math.round(Math.sqrt(dx*dx + dy*dy + dz*dz)) + 'm';
-        
-        if (E.nameOn) {
-          var nm = p.name || p.nick || ('bot' + (p.id != null ? p.id : ''));
-          s.name.textContent = String(nm).slice(0, 15);
-          if (s.name.style.display !== 'block') s.name.style.display = 'block';
-        } else {
-          if (s.name.style.display !== 'none') s.name.style.display = 'none';
+        if (slow) {
+          var dx = hp.x - cx, dy = hp.y - cy, dz = hp.z - cz;
+          s.tx.textContent = Math.round(Math.sqrt(dx*dx + dy*dy + dz*dz)) + 'm';
+          if (E.nameOn) {
+            var nm = p.name || p.nick || ('bot' + (p.id != null ? p.id : ''));
+            s.name.textContent = String(nm).slice(0, 15);
+            if (s.name.style.display !== 'block') s.name.style.display = 'block';
+          } else if (s.name.style.display !== 'none') {
+            s.name.style.display = 'none';
+          }
+          s.hpTxt.textContent = Math.round(p.hp) + ' HP';
+          if (s.hpTxt.style.display !== 'block') s.hpTxt.style.display = 'block';
         }
       }
       
@@ -1274,13 +1281,14 @@
         if (E.slots[idx].box.style.display !== 'none') {
           E.slots[idx].box.style.display = 'none';
           if (E.slots[idx].name) E.slots[idx].name.style.display = 'none';
+          if (E.slots[idx].hpTxt) E.slots[idx].hpTxt.style.display = 'none';
         }
       }
       E.n = idx;
     }
     E.nameOn = 0;
 
-    var BE = { on: 0, wrap: null, host: null, hostRect: null, hostAt: 0, last: 0, range: 60 };
+    var BE = { on: 0, wrap: null, host: null, hostRect: null, hostAt: 0, last: 0, range: 60, hue: 0 };
     var BONE_PAIRS = [
       ['Head','Neck'],['Neck','Spine3'],['Spine3','Spine2'],['Spine2','Spine1'],['Spine1','Pelvis'],
       ['Spine3','L_Clavicle'],['L_Clavicle','L_UpperArm'],['L_UpperArm','L_Forearm'],['L_Forearm','L_Hand'],
@@ -1299,7 +1307,7 @@
     function beClear() { if (BE.ctx && BE.wrap) { BE.ctx.clearRect(0, 0, BE.wrap.width, BE.wrap.height); } }
     function beHost() {
       var now = performance.now();
-      if (BE.host && BE.host.parentNode && now - BE.hostAt < 1000) return BE.host;
+      if (BE.host && BE.host.parentNode && now - BE.hostAt < 2000) return BE.host;
       BE.hostAt = now;
       var best = null, ba = 0, cs = document.getElementsByTagName('canvas');
       for (var i = 0; i < cs.length; i++) {
@@ -1333,7 +1341,11 @@
       var ctx = BE.ctx;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, innerWidth, innerHeight);
-      ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+      BE.hue = (BE.hue + 1.5) % 360;
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'hsl(' + BE.hue + ',100%,65%)';
+      ctx.shadowColor = 'hsl(' + BE.hue + ',100%,60%)';
+      ctx.shadowBlur = 3;
       var my = self.team, me = cam.matrixWorld.elements;
       var cx = me[12], cy = me[13], cz = me[14];
       var pa = { x: 0, y: 0 }, pb = { x: 0, y: 0 };
@@ -1341,7 +1353,8 @@
         var p = list[i];
         if (!p || !p.obj || !p.c || p === self) continue;
         if (p.team === my || p.dead || !(p.hp > 0)) continue;
-        var mm = p.obj.matrixWorld && p.obj.matrixWorld.elements; if (!mm) continue;
+        var mw = p.obj.matrixWorld; if (!mw) continue;
+        var mm = mw.elements; if (!mm) continue;
         var dx = mm[12] - cx, dy = mm[13] - cy, dz = mm[14] - cz;
         var dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
         if (dist > BE.range) continue;
@@ -1353,9 +1366,12 @@
           if (!beProject(cam, r, bb, pb)) continue;
           if (pa.x < r.left - 200 || pa.x > r.left + r.width + 200) continue;
           if (pa.y < r.top - 200 || pa.y > r.top + r.height + 200) continue;
+          var hue = (BE.hue + j * 12) % 360;
+          ctx.strokeStyle = 'hsl(' + hue + ',100%,65%)';
           ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pb.x, pb.y); ctx.stroke();
         }
       }
+      ctx.shadowBlur = 0;
     }
 
     var _wbLast = 0;
@@ -1371,7 +1387,7 @@
       }
       if (!E.on) { eClear(); } else {
         var t = performance.now();
-        if (t - E.last < 16) {} else { 
+        if (t - E.last < 33) {} else { 
           E.last = t;
           if (!eInit()) {} else if (!g) { eClear(); } else { try { eDraw(g); } catch (err) { eClear(); } }
         }
@@ -1615,6 +1631,7 @@
     }
     function qcTick() {
       requestAnimationFrame(qcTick);
+      if (!QC.on && !QC.fast) return;
       try {
         var g = G || game(); if (!g || !g.P || !g.P.s) return;
         var p = g.P, s = p.s;
@@ -1642,7 +1659,7 @@
     }
     try { requestAnimationFrame(qcTick); } catch (e) {}
 
-    /* ===== MAKRO AUTO QQ (dari MACROQQ.js) ===== */
+    /* ===== MAKRO AUTO QQ ===== */
     var MQQ = {
       on: 0,
       fast: 1,
@@ -2135,7 +2152,6 @@
           if (pd < P.reach + 50) {
             var pdot = (pdx*fx + pdy*fy + pdz*fz) / pd;
             var pang = Math.acos(clamp(pdot, -1, 1));
-            // 360°: prev target selalu eligible selama FOV izinkan
             if (pang <= SA.fovRad) {
               best = prev;
               bestScore = pd * 0.5 + pang * 20;
@@ -2153,8 +2169,6 @@
         if (d < 1.5 || d > P.reach + 50) continue;
         var dot = (dx*fx + dy*fy + dz*fz) / d;
         var ang = Math.acos(clamp(dot, -1, 1));
-        // 360°: tidak filter ang > fovRad — semua arah eligible
-        // Skor: sudut lebih kecil = prioritas, tapi target dekat tetap kompetitif
         var score = ang * 20 + d * 0.5;
         if (score < bestScore) {
           bestScore = score;
@@ -2243,7 +2257,7 @@
       var host = document.body || document.documentElement; if (!host) return false;
       var w = document.createElement('div');
       w.setAttribute('data-pb', '1');
-      w.style.cssText = 'position:fixed;right:8px;bottom:8px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.7);border:1px solid rgba(0,180,80,.6);z-index:2147483000;pointer-events:none;display:none';
+      w.style.cssText = 'position:fixed;right:8px;bottom:8px;width:110px;height:110px;border-radius:50%;background:rgba(20,8,38,.75);border:1.5px solid rgba(168,85,247,.6);z-index:2147483000;pointer-events:none;display:none';
       host.appendChild(w); RD.el = w; RD.dots = []; return true;
     }
     function rdDraw(g) {
@@ -2264,11 +2278,11 @@
         var d = Math.sqrt(dx*dx + dz*dz); if (d > range) continue;
         var ca = Math.cos(-yaw), sa = Math.sin(-yaw);
         var rx = dx*ca - dz*sa, rz = dx*sa + dz*ca;
-        var cx = 60 + (rx/range)*55, cz = 60 + (rz/range)*55;
+        var cx = 55 + (rx/range)*50, cz = 55 + (rz/range)*50;
         var dot = RD.dots[idx];
         if (!dot) {
           dot = document.createElement('div');
-          dot.style.cssText = 'position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#ef4444';
+          dot.style.cssText = 'position:absolute;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#a855f7;box-shadow:0 0 6px #a855f7';
           RD.el.appendChild(dot); RD.dots[idx] = dot;
         }
         dot.style.display = 'block';
@@ -2284,10 +2298,10 @@
       var _eSlot = eSlot;
       eSlot = function (i) {
         var s = _eSlot(i);
-        if (!s.tx2) {
-          s.tx2 = document.createElement('div');
-          s.tx2.style.cssText = 'position:absolute;left:0;top:-13px;font:9px/10px system-ui,sans-serif;color:#f87171;text-shadow:0 1px 1px rgba(0,0,0,0.9);white-space:nowrap;font-weight:600';
-          s.box.appendChild(s.tx2);
+        if (!s.hpTxt) {
+          s.hpTxt = document.createElement('div');
+          s.hpTxt.style.cssText = 'position:absolute;right:-40px;top:-2px;font:800 10px/10px system-ui,sans-serif;color:#fff;text-shadow:0 0 3px #000,0 1px 1px #000;white-space:nowrap;display:none';
+          s.box.appendChild(s.hpTxt);
         }
         return s;
       };
@@ -2300,12 +2314,12 @@
           for (var i = 0; i < list.length; i++) {
             var p = list[i];
             if (!p || p === self || p.dead || !(p.hp > 0) || p.team === self.team) continue;
-            var s = E.slots[idx++]; if (!s || !s.tx2) continue;
-            s.tx2.textContent = Math.round(p.hp) + ' HP';
-            if (s.tx2.style.display !== 'block') s.tx2.style.display = 'block';
+            var s = E.slots[idx++]; if (!s || !s.hpTxt) continue;
+            s.hpTxt.textContent = Math.round(p.hp) + ' HP';
+            if (s.hpTxt.style.display !== 'block') s.hpTxt.style.display = 'block';
           }
           for (; idx < E.slots.length; idx++) {
-            var s2 = E.slots[idx]; if (s2 && s2.tx2 && s2.tx2.style.display !== 'none') s2.tx2.style.display = 'none';
+            var s2 = E.slots[idx]; if (s2 && s2.hpTxt && s2.hpTxt.style.display !== 'none') s2.hpTxt.style.display = 'none';
           }
         } catch (e) {}
       };
@@ -2317,7 +2331,7 @@
       var host = document.body || document.documentElement; if (!host) return false;
       var w = document.createElement('div');
       w.setAttribute('data-pb', '1');
-      w.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);border:1px dashed rgba(255,255,255,0.4);border-radius:50%;z-index:2147482999;pointer-events:none;display:none';
+      w.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);border:1.5px dashed rgba(168,85,247,0.5);border-radius:50%;z-index:2147482999;pointer-events:none;display:none';
       host.appendChild(w); FC.el = w; return true;
     }
     function fcTick() {
@@ -2333,25 +2347,20 @@
 
     var SL = { on: 0 };
 
-    var TR = { on: 0, wrap: null, host: null, hostRect: null, hostAt: 0, slots: [], last: 0 };
+    /* ===== TRACER UNGU SOLID — RINGAN, TANPA RGB ===== */
+    var TR = { on: 0, wrap: null, host: null, hostRect: null, hostAt: 0, last: 0 };
     function trInit() {
       if (TR.wrap && TR.wrap.parentNode) return true;
       var host = document.body || document.documentElement; if (!host) return false;
-      var w = document.createElement('div');
+      var w = document.createElement('canvas');
       w.setAttribute('data-pb', '1');
-      w.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none;z-index:2147482999';
-      host.appendChild(w); TR.wrap = w; TR.slots = []; return true;
+      w.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:2147482999';
+      host.appendChild(w); TR.wrap = w; TR.ctx = w.getContext('2d'); return true;
     }
-    function trSlot(i) {
-      var s = TR.slots[i]; if (s) return s;
-      var line = document.createElement('div');
-      line.style.cssText = 'position:absolute;left:0;top:0;height:1px;background:linear-gradient(90deg,rgba(56,189,248,0.8),rgba(56,189,248,0.1));transform-origin:0 50%;display:none;border-radius:1px';
-      TR.wrap.appendChild(line); s = { line: line }; TR.slots[i] = s; return s;
-    }
-    function trClear() { for (var i = 0; i < TR.slots.length; i++) TR.slots[i].line.style.display = 'none'; }
+    function trClear() { if (TR.ctx && TR.wrap) { TR.ctx.clearRect(0, 0, TR.wrap.width, TR.wrap.height); } }
     function trHost() {
       var now = performance.now();
-      if (TR.host && TR.host.parentNode && now - TR.hostAt < 1000) return TR.host;
+      if (TR.host && TR.host.parentNode && now - TR.hostAt < 2000) return TR.host;
       TR.hostAt = now;
       var best = null, ba = 0, cs = document.getElementsByTagName('canvas');
       for (var i = 0; i < cs.length; i++) {
@@ -2377,8 +2386,22 @@
       if (!trInit()) return;
       var host = trHost(); if (!host) { trClear(); return; }
       var r = TR.hostRect || host.getBoundingClientRect(); if (!(r.width > 0)) { trClear(); return; }
-      var ox = r.left + r.width/2, oy = r.top;
-      var my = self.team, idx = 0;
+      var dpr = Math.min(2, devicePixelRatio || 1);
+      var w = Math.round(innerWidth * dpr), h = Math.round(innerHeight * dpr);
+      if (TR.wrap.width !== w || TR.wrap.height !== h) { TR.wrap.width = w; TR.wrap.height = h; }
+      var ctx = TR.ctx;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+      var ox = r.left + r.width / 2, oy = r.top;
+      var my = self.team;
+
+      /* Style ungu solid — 1 pass glow + 1 pass core. Ringan banget. */
+      ctx.lineWidth = 1.8;
+      ctx.strokeStyle = 'rgba(168,85,247,0.95)';
+      ctx.shadowColor = 'rgba(168,85,247,0.8)';
+      ctx.shadowBlur = 4;
+
       for (var i = 0; i < list.length; i++) {
         var p = list[i];
         if (!p || !p.obj || !p.c || p === self) continue;
@@ -2387,17 +2410,11 @@
         var t = trProj(cam, r, hp.x, hp.y, hp.z); if (!t) continue;
         if (t.x < r.left - 40 || t.x > r.left + r.width + 40) continue;
         if (t.y < r.top - 40 || t.y > r.top + r.height + 40) continue;
-        var dx = t.x - ox, dy = t.y - oy, len = Math.sqrt(dx*dx + dy*dy);
+        var len = Math.sqrt((t.x - ox) * (t.x - ox) + (t.y - oy) * (t.y - oy));
         if (len < 20) continue;
-        var ang = Math.atan2(dy, dx)*180/Math.PI;
-        var s = trSlot(idx++);
-        s.line.style.display = 'block';
-        s.line.style.left = ox.toFixed(1) + 'px';
-        s.line.style.top = oy.toFixed(1) + 'px';
-        s.line.style.width = len.toFixed(1) + 'px';
-        s.line.style.transform = 'rotate(' + ang.toFixed(2) + 'deg)';
+        ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(t.x, t.y); ctx.stroke();
       }
-      for (; idx < TR.slots.length; idx++) TR.slots[idx].line.style.display = 'none';
+      ctx.shadowBlur = 0;
     }
 
     var PBX_API = {
@@ -2588,7 +2605,7 @@
     }, 1000);
 
     /* ============================================================
-       UI & FPS REALTIME MONITOR + HIDE UI
+       UI (LEBIH LEBAR, LEBIH PENDEK KE BAWAH) — v3.5.4
        ============================================================ */
     (function pbUI() {
       if (window.__pbUI) return;
@@ -2606,91 +2623,149 @@
       })();
 
       var css = [
-        '.fk{position:fixed;top:8px;right:8px;z-index:2147483600;font:12px/1.3 system-ui,Tahoma,sans-serif;color:#1f2937;',
-        '  background:#fff;border:1px solid #e8ecf0;border-radius:10px;',
-        '  box-shadow:0 3px 14px rgba(0,0,0,.08);pointer-events:auto;user-select:none;overflow:hidden;transition:width .15s,height .15s;max-height:96vh;display:flex;flex-direction:column}',
-        '.fk.hide{display:none}',
-        '.fk.expanded{display:flex;flex-direction:row}',
-        '.fk.expanded .fk-rail{display:flex;flex-direction:column;background:#fafbfc;border-right:1px solid #eef1f4;',
-        '  width:46px;padding:4px 0;gap:1px;flex:0 0 46px;order:0;overflow-y:auto;max-height:92vh}',
-        '.fk-rail::-webkit-scrollbar{width:2px}',
-        '.fk-rail::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px}',
-        '.fk-rail::-webkit-scrollbar-track{background:transparent}',
-        '.fk.expanded .fk-body-col{order:1;width:290px;display:flex;flex-direction:column;min-width:0}',
-        '.fk.expanded .fk-tabbar{display:none}',
-        '.fk.collapsed{width:auto}',
-        '.fk.collapsed .fk-rail{display:none}',
-        '.fk.collapsed .fk-body-col{display:none}',
-        '.fk.collapsed .fk-tabbar{display:flex;align-items:center;gap:6px;padding:5px 9px;background:#fafbfc;border-radius:10px;cursor:move}',
-        '.fk.collapsed .fk-tb-title{font:800 11px/1 system-ui,Tahoma,sans-serif;color:#0f172a;letter-spacing:.5px;white-space:nowrap}',
-        '.fk.collapsed .fk-tb-title .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#7c3aed;margin-right:5px;vertical-align:middle}',
-        '.fk-tabbar .fk-tb-open{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;',
-        '  justify-content:center;font-size:12px;color:#fff;cursor:pointer;background:#7c3aed;font-weight:900;flex:0 0 22px;line-height:1}',
-        '.fk-tabbar .fk-tb-open:hover{background:#6d28d9}',
-        '.fk-rail .fk-rail-btn{width:42px;height:38px;margin:0 auto;border-radius:6px;display:flex;flex-direction:column;',
-        '  align-items:center;justify-content:center;gap:1px;color:#8892a0;cursor:pointer;transition:all .12s;flex:0 0 38px}',
-        '.fk-rail .fk-rail-btn i{font-size:11px;line-height:1}',
-        '.fk-rail .fk-rail-btn span{font-size:6.5px;font-weight:800;letter-spacing:.2px;line-height:1}',
-        '.fk-rail .fk-rail-btn:hover{background:#f0f2f5;color:#7c3aed}',
-        '.fk-rail .fk-rail-btn.on{background:#7c3aed;color:#fff}',
-        '.fk-h{display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid #eef1f4;',
-        '  background:#fafbfc;font-weight:700;cursor:move}',
-        '.fk-h .dot{width:7px;height:7px;border-radius:50%;background:#7c3aed;flex:0 0 7px}',
-        '.fk-h .title{font-size:12px;color:#0f172a;letter-spacing:.4px}',
-        '.fk-h .v{opacity:.7;font-weight:400;font-size:9px;margin-left:auto;color:#8892a0}',
-        '.fk-toggle-group{display:flex;gap:4px;margin-left:4px}',
-        '.fk-toggle{cursor:pointer;color:#fff;border-radius:4px;',
-        '  width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex:0 0 20px;font-size:10px;background:#7c3aed}',
-        '.fk-toggle:hover{background:#6d28d9}',
-        '.fk-body{padding:6px 9px 9px;max-height:60vh;overflow:auto;background:#fff}',
-        '.fk-body::-webkit-scrollbar{width:3px}',
-        '.fk-body::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px}',
+        /* ===== ROOT — lebih lebar, lebih pendek ===== */
+        '.fk{position:fixed;top:6px;right:6px;z-index:2147483600;font:10px/1.2 "Segoe UI",system-ui,sans-serif;color:#d9d4f5;',
+        '  background:linear-gradient(160deg,#150725 0%,#0c0414 100%);border:1px solid #6d28d9;border-radius:8px;',
+        '  box-shadow:0 0 0 1px rgba(124,58,237,.15), 0 8px 24px rgba(0,0,0,.65);',
+        '  pointer-events:auto;user-select:none;overflow:hidden;max-height:72vh;display:flex;flex-direction:column}',
+        '.fk.collapsed{width:auto;border-radius:8px}',
+        '.fk.collapsed .fk-rail,.fk.collapsed .fk-body-col{display:none}',
+        /* ===== TABBAR MINIMIZE — lebih besar & panjang ke samping ===== */
+        '.fk.collapsed .fk-tabbar{display:flex;align-items:center;gap:6px;padding:5px 9px;cursor:move;min-width:150px;border-radius:8px}',
+        '.fk-tabbar{display:none}',
+        '.fk.expanded{display:flex;flex-direction:row;width:auto;max-width:92vw}',
+
+        /* ===== LOGO ===== */
+        '.fk-logo{width:18px;height:18px;flex:0 0 18px;border-radius:4px;display:flex;align-items:center;justify-content:center;',
+        '  background:linear-gradient(145deg,#7c3aed 0%,#4c1d95 65%,#2e1065 100%);',
+        '  box-shadow:0 0 6px rgba(168,85,247,.5), inset 0 1px 0 rgba(255,255,255,.22);',
+        '  position:relative;transform:perspective(14px) rotateX(3deg) skewX(-2deg)}',
+        '.fk-logo::before{content:"IR";font:italic 900 8px/1 "Segoe UI",sans-serif;color:#fff;letter-spacing:-.6px;',
+        '  text-shadow:0 1px 0 #6d28d9,0 2px 2px rgba(0,0,0,.55);transform:translateZ(2px)}',
+        '.fk-logo.small{width:14px;height:14px;flex:0 0 14px;border-radius:3px}',
+        '.fk-logo.small::before{font-size:6.5px}',
+
+        /* ===== RAIL ===== */
+        '.fk-rail{display:flex;flex-direction:column;background:rgba(12,4,20,.92);border-right:1px solid #2a1747;',
+        '  width:48px;padding:3px 0;gap:0;flex:0 0 48px;overflow-y:auto;max-height:70vh}',
+        '.fk-rail::-webkit-scrollbar{width:1px}',
+        '.fk-rail::-webkit-scrollbar-thumb{background:#4c1d95;border-radius:1px}',
+        '.fk-rail-btn{width:42px;height:30px;margin:0 auto;border-radius:4px;display:flex;flex-direction:column;',
+        '  align-items:center;justify-content:center;gap:0;color:#7a6b9e;cursor:pointer;transition:all .1s;flex:0 0 30px;border:1px solid transparent}',
+        '.fk-rail-btn i{font-size:9px;line-height:1}',
+        '.fk-rail-btn span{font-size:5px;font-weight:800;letter-spacing:.1px;line-height:1;margin-top:1px}',
+        '.fk-rail-btn:hover{background:rgba(124,58,237,.12);color:#c4b5fd}',
+        '.fk-rail-btn.on{background:linear-gradient(135deg,#7c3aed,#5b21b6);border-color:#a855f7;box-shadow:0 0 6px rgba(168,85,247,.4)}',
+        '.fk-rail-btn.on i,.fk-rail-btn.on span{color:#fff}',
+
+        /* ===== BODY COL — lebih lebar ===== */
+        '.fk-body-col{order:1;width:268px;display:flex;flex-direction:column;min-width:0;background:transparent}',
+
+        /* ===== HEADER ===== */
+        '.fk-h{display:flex;align-items:center;gap:5px;padding:4px 6px;border-bottom:1px solid #2a1747;',
+        '  background:rgba(12,4,20,.6);cursor:move}',
+        '.fk-h .title{font-size:9px;color:#e9d5ff;letter-spacing:.5px;font-weight:900;display:flex;align-items:center;gap:3px}',
+        '.fk-h .title b{color:#a855f7}',
+
+        /* ===== TOGGLE GROUP ===== */
+        '.fk-toggle-group{display:flex;gap:2px;margin-left:auto}',
+        '.fk-toggle{cursor:pointer;color:#c4b5fd;border-radius:3px;width:15px;height:15px;',
+        '  display:flex;align-items:center;justify-content:center;flex:0 0 15px;font-size:7px;',
+        '  background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3)}',
+        '.fk-toggle:hover{background:rgba(124,58,237,.4);color:#fff}',
+
+        /* ===== BODY — diperpendek max-height ===== */
+        '.fk-body{padding:3px 5px 5px;max-height:48vh;overflow:auto;background:transparent}',
+        '.fk-body::-webkit-scrollbar{width:2px}',
+        '.fk-body::-webkit-scrollbar-thumb{background:#4c1d95;border-radius:2px}',
         '.fk-page{display:none}',
         '.fk-page.on{display:block}',
-        '.fk-sec{margin:8px 0 4px;font-size:9px;letter-spacing:1px;color:#7c3aed;text-transform:uppercase;opacity:.9;font-weight:800;display:flex;align-items:center;gap:4px}',
-        '.fk-sec:first-child{margin-top:0}',
-        '.fk-sec i{font-size:10px}',
-        '.fk-row{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:3px 0}',
-        '.fk-row label{flex:1;color:#334155;font-size:11px;line-height:1.25}',
-        '.fk-row small{display:block;color:#a0aab5;font-size:9px;line-height:1.15;margin-top:1px}',
-        '.fk-row .risk-badge{display:inline-block;padding:0 3px;margin-left:3px;border-radius:2px;font-size:7px;',
-        '  background:#f59e0b;color:#fff;font-weight:900;vertical-align:middle;letter-spacing:.2px;line-height:9px}',
-        '.fk-row .new-badge{display:inline-block;padding:0 3px;margin-left:3px;border-radius:2px;font-size:7px;',
-        '  background:#10b981;color:#fff;font-weight:900;vertical-align:middle;letter-spacing:.2px;line-height:9px}',
-        '.fk-sw{position:relative;width:32px;height:17px;flex:0 0 32px;border-radius:9px;background:#d4dae1;transition:background .15s;cursor:pointer}',
-        '.fk-sw::after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.15);transition:transform .15s}',
-        '.fk-sw.on{background:#7c3aed}',
-        '.fk-sw.on::after{transform:translateX(15px)}',
-        '.fk-slider{display:flex;align-items:center;gap:6px;padding:2px 0}',
-        '.fk-slider label{flex:0 0 80px;font-size:10px;color:#334155}',
-        '.fk-slider input[type=range]{flex:1;height:2px;-webkit-appearance:none;background:#d4dae1;border-radius:2px;outline:none}',
-        '.fk-slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#7c3aed;cursor:pointer}',
-        '.fk-slider .n{flex:0 0 42px;text-align:right;font-size:9px;color:#7c3aed;font-variant-numeric:tabular-nums;font-weight:700}',
-        '.fk-select{width:100%;box-sizing:border-box;padding:4px 7px;border:1px solid #cbd5e1;border-radius:5px;font:11px system-ui,sans-serif;outline:none;background:#fff;color:#334155;cursor:pointer;margin-top:2px}',
-        '.fk-select:focus{border-color:#7c3aed}',
-        '.fk-btns{display:flex;gap:5px;margin-top:5px}',
-        '.fk-btn{flex:1;padding:5px 0;text-align:center;border-radius:5px;background:#f1f5f9;border:1px solid #d4dae1;',
-        '  color:#334155;cursor:pointer;font-size:10px;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:4px}',
-        '.fk-btn:hover{background:#e2e8f0}',
+
+        /* ===== CARDS ===== */
+        '.fk-card{background:rgba(22,9,38,.55);border:1px solid #2a1846;border-radius:4px;padding:3px 5px;margin-bottom:3px}',
+        '.fk-card-h{display:flex;align-items:center;gap:3px;margin-bottom:2px;padding-bottom:1px;border-bottom:1px solid rgba(124,58,237,.15)}',
+        '.fk-card-h i{font-size:8px;color:#a855f7}',
+        '.fk-card-h span{font-size:7px;font-weight:800;color:#c4b5fd;letter-spacing:.2px;text-transform:uppercase}',
+        '.fk-card-h .badge{margin-left:auto;font-size:5.5px;font-weight:900;padding:0 2px;border-radius:2px;background:#10b981;color:#fff;line-height:8px}',
+
+        /* ===== ROWS ===== */
+        '.fk-row{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:1px 0}',
+        '.fk-row label{flex:1;color:#c9c0e8;font-size:8.5px;line-height:1.2}',
+        '.fk-row small{display:block;color:#6f5f92;font-size:6px;line-height:1.1;margin-top:0}',
+        '.fk-row .risk-badge{display:inline-block;padding:0 2px;margin-left:2px;border-radius:2px;font-size:5px;',
+        '  background:#f59e0b;color:#1a0b2e;font-weight:900;vertical-align:middle;line-height:7px}',
+        '.fk-row .new-badge{display:inline-block;padding:0 2px;margin-left:2px;border-radius:2px;font-size:5px;',
+        '  background:#10b981;color:#fff;font-weight:900;vertical-align:middle;line-height:7px}',
+
+        /* ===== CHECKBOX ===== */
+        '.fk-sw{position:relative;width:11px;height:11px;flex:0 0 11px;border-radius:2px;background:transparent;',
+        '  border:1.2px solid #4c3a75;transition:all .1s;cursor:pointer;display:flex;align-items:center;justify-content:center}',
+        '.fk-sw::after{content:"\\2713";font-size:7px;font-weight:900;color:#fff;opacity:0;transition:opacity .1s;line-height:1}',
+        '.fk-sw.on{background:linear-gradient(135deg,#a855f7,#7c3aed);border-color:#c4b5fd;box-shadow:0 0 4px rgba(168,85,247,.5)}',
+        '.fk-sw.on::after{opacity:1}',
+
+        /* ===== SLIDER ===== */
+        '.fk-slider{display:flex;align-items:center;gap:3px;padding:0}',
+        '.fk-slider label{flex:0 0 50px;font-size:7px;color:#a99bcb}',
+        '.fk-slider input[type=range]{flex:1;height:2px;-webkit-appearance:none;background:#2e1b4e;border-radius:2px;outline:none}',
+        '.fk-slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height:8px;border-radius:50%;',
+        '  background:linear-gradient(135deg,#c4b5fd,#a855f7);cursor:pointer;box-shadow:0 0 3px rgba(168,85,247,.6);border:1px solid #e9d5ff}',
+        '.fk-slider .n{flex:0 0 30px;text-align:right;font-size:6.5px;color:#c4b5fd;font-variant-numeric:tabular-nums;font-weight:700}',
+
+        /* ===== SELECT ===== */
+        '.fk-select{width:100%;box-sizing:border-box;padding:2px 4px;border:1px solid #4c1d95;border-radius:3px;',
+        '  font:8.5px "Segoe UI",sans-serif;outline:none;background:#150725;color:#d9d4f5;cursor:pointer;margin-top:1px}',
+        '.fk-select:focus{border-color:#a855f7}',
+        '.fk-select option{background:#150725;color:#d9d4f5}',
+
+        /* ===== BUTTONS ===== */
+        '.fk-btns{display:flex;gap:3px;margin-top:2px}',
+        '.fk-btn{flex:1;padding:2.5px 0;text-align:center;border-radius:3px;background:rgba(124,58,237,.12);',
+        '  border:1px solid #4c1d95;color:#c4b5fd;cursor:pointer;font-size:7.5px;font-weight:700;transition:all .1s;',
+        '  display:flex;align-items:center;justify-content:center;gap:2px}',
+        '.fk-btn:hover{background:rgba(124,58,237,.28);border-color:#a855f7}',
         '.fk-btn:active{background:#7c3aed;color:#fff}',
-        '.fk-btn.on{background:#7c3aed;border-color:#7c3aed;color:#fff}',
-        '.fk-btn.danger{border-color:#fca5a5;background:#fef2f2;color:#b91c1c}',
-        '.fk-btn.danger:hover{background:#fee2e2}',
-        '.fk-foot{margin-top:6px;padding-top:5px;border-top:1px solid #eef1f4;font-size:9px;color:#8892a0;font-variant-numeric:tabular-nums}',
-        '.fk-warn{margin-top:5px;padding:4px 6px;border-radius:5px;background:#fffbeb;border:1px solid #fcd34d;',
-        '  color:#92400e;font-size:9px;line-height:1.25}',
-        '.fk-sa-tgt{font-size:9px;color:#10b981;padding:2px 6px;margin-top:3px;background:#ecfdf5;border-radius:4px;border:1px solid #6ee7b7}',
-        '.fk-nade-st{font-size:9px;color:#7c3aed;padding:2px 6px;margin-top:3px;background:#f5f3ff;border-radius:4px;border:1px solid #c4b5fd;line-height:1.35}',
-        '.fk-qq-st{font-size:9px;color:#0ea5e9;padding:2px 6px;margin-top:3px;background:#f0f9ff;border-radius:4px;border:1px solid #7dd3fc;line-height:1.35}',
-        '#ir-fps-ms{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:2147483605;background:rgba(0,0,0,0.6);color:#00ffcc;padding:3px 8px;border-radius:6px;font:700 11px monospace;pointer-events:none;box-shadow:0 2px 6px rgba(0,0,0,0.3)}',
-        '#ir-float-eye{position:fixed;top:8px;right:8px;z-index:2147483606;background:rgba(124,58,237,0.20);color:rgba(255,255,255,0.75);width:28px;height:28px;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.25);font-size:11px;transition:all .15s}',
-        '#ir-float-eye:hover{background:rgba(124,58,237,0.7);color:#fff}'
+        '.fk-btn.danger{border-color:#7f1d1d;background:rgba(127,29,29,.2);color:#fca5a5}',
+        '.fk-btn.danger:hover{background:rgba(127,29,29,.45)}',
+
+        /* ===== FOOT / STATS ===== */
+        '.fk-foot{margin-top:2px;padding-top:2px;border-top:1px solid rgba(124,58,237,.15);font-size:6.5px;color:#7a6b9e;font-variant-numeric:tabular-nums;line-height:1.25}',
+        '.fk-warn{margin-top:2px;padding:1.5px 3px;border-radius:2px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);',
+        '  color:#fbbf24;font-size:6px;line-height:1.2}',
+        '.fk-sa-tgt{font-size:6.5px;color:#10b981;padding:1px 3px;margin-top:1.5px;background:rgba(16,185,129,.08);border-radius:2px;border:1px solid rgba(16,185,129,.3)}',
+        '.fk-nade-st{font-size:6.5px;color:#c4b5fd;padding:1px 3px;margin-top:1.5px;background:rgba(124,58,237,.1);border-radius:2px;border:1px solid rgba(124,58,237,.3);line-height:1.2}',
+        '.fk-qq-st{font-size:6.5px;color:#7dd3fc;padding:1px 3px;margin-top:1.5px;background:rgba(14,165,233,.08);border-radius:2px;border:1px solid rgba(14,165,233,.3);line-height:1.2}',
+
+        /* ===== WATERMARK KIRI ATAS ===== */
+        '#ir-watermark{position:fixed;top:10px;left:10px;z-index:2147483605;pointer-events:none;',
+        '  font:900 22px/1 "Segoe UI",sans-serif;color:rgba(168,85,247,0.85);letter-spacing:3px;',
+        '  text-shadow:0 0 14px rgba(168,85,247,.85),0 0 6px rgba(168,85,247,.5),0 2px 4px rgba(0,0,0,.7);',
+        '  user-select:none;-webkit-user-select:none;opacity:1}',
+        '#ir-watermark .order{margin-top:6px;font:800 13px/1.3 "Segoe UI",sans-serif;color:rgba(233,213,255,.95);',
+        '  letter-spacing:.8px;text-shadow:0 0 8px rgba(168,85,247,.8),0 2px 3px rgba(0,0,0,.8)}',
+        '#ir-watermark .order b{color:#c084fc;font-weight:900;text-shadow:0 0 10px rgba(192,132,252,1)}',
+
+        /* ===== FPS ===== */
+        '#ir-fps-ms{position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:2147483605;',
+        '  background:rgba(12,4,20,.8);color:#a855f7;padding:1.5px 6px;border-radius:3px;',
+        '  font:700 8px monospace;pointer-events:none;box-shadow:0 2px 5px rgba(0,0,0,.4);border:1px solid rgba(124,58,237,.35)}',
+
+        /* ===== FLOAT EYE ===== */
+        '#ir-float-eye{position:fixed;top:6px;right:6px;z-index:2147483606;background:rgba(124,58,237,0.3);color:#fff;',
+        '  width:20px;height:20px;border-radius:50%;display:none;align-items:center;justify-content:center;',
+        '  cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.3);border:1px solid rgba(168,85,247,0.5);font-size:8px;transition:all .15s}',
+        '#ir-float-eye:hover{background:rgba(124,58,237,0.7)}'
       ].join('');
 
       var style = document.createElement('style');
       style.setAttribute('data-pb', '1');
       style.textContent = css;
       (document.head || document.documentElement).appendChild(style);
+
+      var wm = document.createElement('div');
+      wm.id = 'ir-watermark';
+      wm.innerHTML = 'IRILMODZ<div class="order">Order cheat? dm tele <b>@FanKunHub</b></div>';
+      (document.body || document.documentElement).appendChild(wm);
 
       var fpsMsEl = document.createElement('div');
       fpsMsEl.id = 'ir-fps-ms';
@@ -2726,16 +2801,11 @@
       function toggle(lsKey, initialDefault, onChange) {
         var savedVal = null;
         try { savedVal = localStorage.getItem('iril_tg_' + lsKey); } catch (e) {}
-        
         var state = savedVal !== null ? (savedVal === 'true') : !!initialDefault;
         var sw = el('div', 'fk-sw' + (state ? ' on' : ''));
-        
-        if (state) {
-          try { onChange(true); } catch (e) {}
-        }
-
+        if (state) { try { onChange(true); } catch (e) {} }
         sw.addEventListener('click', function () {
-          state = !state; 
+          state = !state;
           sw.classList.toggle('on', state);
           try { localStorage.setItem('iril_tg_' + lsKey, state); } catch (e) {}
           try { onChange(state); } catch (e) {}
@@ -2781,10 +2851,13 @@
         r.appendChild(lb); r.appendChild(node);
         return r;
       }
-      function sec(icon, text) {
-        var s = el('div', 'fk-sec');
-        s.innerHTML = '<i class="fa-solid ' + icon + '"></i> ' + text;
-        return s;
+      function card(icon, title, badge) {
+        var c = el('div', 'fk-card');
+        var h = el('div', 'fk-card-h');
+        h.innerHTML = '<i class="fa-solid ' + icon + '"></i><span>' + title + '</span>' +
+          (badge ? '<span class="badge">' + badge + '</span>' : '');
+        c.appendChild(h);
+        return c;
       }
 
       var panel = el('div', 'fk collapsed');
@@ -2792,33 +2865,44 @@
 
       var rail = el('div', 'fk-rail');
       var bodyCol = el('div', 'fk-body-col');
+
       var head = el('div', 'fk-h');
-      head.appendChild(el('div', 'dot'));
-      head.appendChild(el('div', 'title', 'iRiLLL MODZ'));
-      head.appendChild(el('div', 'v', 'V' + V));
-      
+      head.innerHTML = '<div class="fk-logo"></div><div class="title"><b>iRiLLL</b> MODZ</div>';
       var toggleGroup = el('div', 'fk-toggle-group');
-      
+
+      var miniHeaderBtn = el('div', 'fk-toggle');
+      miniHeaderBtn.innerHTML = '<i class="fa-solid fa-minus"></i>';
+      miniHeaderBtn.title = 'Minimize';
+      miniHeaderBtn.addEventListener('click', function (e) { e.stopPropagation(); setCollapsed(true); });
+      miniHeaderBtn.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+      miniHeaderBtn.addEventListener('touchstart', function (e) { e.stopPropagation(); }, { passive: true });
+      toggleGroup.appendChild(miniHeaderBtn);
+
       var hideUiBtn = el('div', 'fk-toggle');
       hideUiBtn.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
       hideUiBtn.title = 'Hide UI';
       toggleGroup.appendChild(hideUiBtn);
 
-      var toggleBtn = el('div', 'fk-toggle');
-      toggleBtn.innerHTML = '<i class="fa-solid fa-minus"></i>';
-      toggleBtn.title = 'Minimize';
-      toggleGroup.appendChild(toggleBtn);
-      
       head.appendChild(toggleGroup);
-      var body = el('div', 'fk-body');
       bodyCol.appendChild(head);
+
+      var body = el('div', 'fk-body');
       bodyCol.appendChild(body);
 
+      /* ===== TABBAR MINIMIZE — lebih gede & panjang ke samping ===== */
       var tabbar = el('div', 'fk-tabbar');
-      var tbTitle = el('div', 'fk-tb-title');
-      tbTitle.innerHTML = '<span class="dot"></span>iRiLLL MODZ';
+      var tbLogo = el('div', 'fk-logo small');
+      tabbar.appendChild(tbLogo);
+      var tbTitle = el('div');
+      tbTitle.style.cssText = 'font:800 10px "Segoe UI",sans-serif;color:#c4b5fd;letter-spacing:.6px;white-space:nowrap';
+      tbTitle.textContent = 'IRILMODZ PBWEB';
       tabbar.appendChild(tbTitle);
-      var tbOpen = el('div', 'fk-tb-open', '+');
+      var tbVer = el('div');
+      tbVer.style.cssText = 'font:700 8px "Segoe UI",sans-serif;color:#a855f7;opacity:.85;margin-left:2px';
+      tbVer.textContent = 'v' + V;
+      tabbar.appendChild(tbVer);
+      var tbOpen = el('div', null, '+');
+      tbOpen.style.cssText = 'width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;cursor:pointer;background:#7c3aed;font-weight:900;line-height:1;margin-left:auto;box-shadow:0 0 6px rgba(168,85,247,.5)';
       tbOpen.title = 'Buka menu';
       tbOpen.addEventListener('click', function (e) { e.stopPropagation(); setCollapsed(false); });
       tbOpen.addEventListener('mousedown', function (e) { e.stopPropagation(); });
@@ -2830,37 +2914,26 @@
       panel.appendChild(tabbar);
 
       function setUiHidden(hidden) {
-        if (hidden) {
-          panel.style.display = 'none';
-          floatEye.style.display = 'flex';
-        } else {
-          panel.style.display = 'flex';
-          floatEye.style.display = 'none';
-        }
+        if (hidden) { panel.style.display = 'none'; floatEye.style.display = 'flex'; }
+        else { panel.style.display = 'flex'; floatEye.style.display = 'none'; }
       }
-
-      hideUiBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        setUiHidden(true);
-      });
-      floatEye.addEventListener('click', function () {
-        setUiHidden(false);
-      });
+      hideUiBtn.addEventListener('click', function (e) { e.stopPropagation(); setUiHidden(true); });
+      floatEye.addEventListener('click', function () { setUiHidden(false); });
 
       var TAB_META = {
-        aim:    { icon: 'fa-crosshairs',    label: 'AIM',    title: 'Aim Lock' },
-        aimbot: { icon: 'fa-bullseye',      label: 'AIMBOT', title: 'Aimbot' },
-        esp:    { icon: 'fa-eye',           label: 'ESP',    title: 'ESP' },
-        silent: { icon: 'fa-crosshairs',    label: 'SILENT', title: 'Silent Aim' },
-        shoot:  { icon: 'fa-gun',           label: 'SHOOT',  title: 'Shooting' },
-        combat: { icon: 'fa-shield-halved', label: 'COMBAT', title: 'Combat' },
-        fly:    { icon: 'fa-plane',         label: 'FLY',    title: 'Fly' },
-        noclip: { icon: 'fa-ghost',         label: 'NOCLIP', title: 'Noclip' },
-        nade:   { icon: 'fa-bomb',          label: 'NADE',   title: 'Grenade' },
-        move:   { icon: 'fa-feather',       label: 'MOVE',   title: 'Movement' },
-        macro:  { icon: 'fa-bolt',          label: 'MACRO',  title: 'Makro Auto QQ' },
-        misc:   { icon: 'fa-sliders',       label: 'MISC',   title: 'Misc' },
-        info:   { icon: 'fa-circle-info',   label: 'INFO',   title: 'Info' }
+        aim:    { icon: 'fa-crosshairs',    label: 'MAIN',    title: 'Aim Lock' },
+        aimbot: { icon: 'fa-bullseye',      label: 'AIMBOT',  title: 'Aimbot' },
+        esp:    { icon: 'fa-eye',           label: 'ESP',     title: 'ESP' },
+        silent: { icon: 'fa-crosshairs',    label: 'SILENT',  title: 'Silent Aim' },
+        shoot:  { icon: 'fa-gun',           label: 'SHOOT',   title: 'Shooting' },
+        combat: { icon: 'fa-shield-halved', label: 'COMBAT',  title: 'Combat' },
+        fly:    { icon: 'fa-plane',         label: 'FLY',     title: 'Fly' },
+        noclip: { icon: 'fa-ghost',         label: 'NOCLIP',  title: 'Noclip' },
+        nade:   { icon: 'fa-bomb',          label: 'NADE',    title: 'Grenade' },
+        move:   { icon: 'fa-feather',       label: 'MOVE',    title: 'Movement' },
+        macro:  { icon: 'fa-bolt',          label: 'MACRO',   title: 'Makro Auto QQ' },
+        misc:   { icon: 'fa-sliders',       label: 'MISC',    title: 'Misc' },
+        info:   { icon: 'fa-circle-info',   label: 'INFO',    title: 'Info' }
       };
 
       function setCollapsed(collapsed) {
@@ -2868,13 +2941,9 @@
         panel.classList.toggle('expanded', !collapsed);
         try { localStorage.setItem('ir_collapsed', collapsed ? '1' : '0'); } catch (e) {}
       }
-      toggleBtn.addEventListener('click', function (e) { e.stopPropagation(); setCollapsed(true); });
-      toggleBtn.addEventListener('mousedown', function (e) { e.stopPropagation(); });
-      toggleBtn.addEventListener('touchstart', function (e) { e.stopPropagation(); }, { passive: true });
 
       var TAB_KEY = 'ir_ui_tab';
       var tabsRail = {}, pages = {}, order = [];
-
       function addTab(key, label) {
         var meta = TAB_META[key] || { icon: 'fa-circle', label: label, title: label };
         var tR = el('div', 'fk-rail-btn');
@@ -2883,7 +2952,6 @@
         tR.addEventListener('click', function () { selectTab(key); });
         rail.appendChild(tR);
         tabsRail[key] = tR;
-
         var p = el('div', 'fk-page');
         body.appendChild(p);
         pages[key] = p;
@@ -2898,248 +2966,239 @@
         try { localStorage.setItem(TAB_KEY, key); } catch (e) {}
       }
 
-      var pAim = addTab('aim', 'AIM');
-      pAim.appendChild(sec('fa-crosshairs', 'Mode Aim Lock'));
-
+      /* ================= MAIN ================= */
+      var pAim = addTab('aim', 'MAIN');
+      var cAim1 = card('fa-crosshairs', 'Aim Lock', 'ACTIVE');
       var lockModeSel = el('select', 'fk-select');
-      lockModeSel.innerHTML =
-        '<option value="pov">POV Circle</option>' +
-        '<option value="legacy">Legacy Cone</option>';
+      lockModeSel.innerHTML = '<option value="pov">POV Circle</option><option value="legacy">Legacy Cone</option>';
       lockModeSel.value = P.lockMode;
       lockModeSel.addEventListener('change', function () { window.__pb.lockMode(this.value); });
-      pAim.appendChild(lockModeSel);
+      cAim1.appendChild(lockModeSel);
+      pAim.appendChild(cAim1);
 
-      pAim.appendChild(sec('fa-bullseye', 'Titik Tembak'));
+      var cAim2 = card('fa-bullseye', 'Target Hitbox');
       var hitboxSelect = el('select', 'fk-select');
       hitboxSelect.innerHTML = '<option value="head">Head</option><option value="neck">Neck</option><option value="body">Body</option><option value="nearest">Nearest</option>';
       hitboxSelect.value = P.hitbox;
       hitboxSelect.addEventListener('change', function () { window.__pb.hitbox(this.value); });
-      pAim.appendChild(hitboxSelect);
+      cAim2.appendChild(hitboxSelect);
+      pAim.appendChild(cAim2);
 
-      pAim.appendChild(sec('fa-rocket', 'Lead Prediction'));
+      var cAim3 = card('fa-rocket', 'Lead Prediction');
       var bsS = slider(100, 800, 10, P.bulletSpeed, function (v) { return v.toFixed(0) + 'm/s'; }, function (v) { window.__pb.bulletSpeed(v); });
-      bsS.label.textContent = 'Bullet speed'; pAim.appendChild(bsS.node);
+      bsS.label.textContent = 'Bullet'; cAim3.appendChild(bsS.node);
       var lfS = slider(0, 2, 0.05, P.leadFactor, function (v) { return 'x' + v.toFixed(2); }, function (v) { window.__pb.leadFactor(v); });
-      lfS.label.textContent = 'Lead factor'; pAim.appendChild(lfS.node);
+      lfS.label.textContent = 'Lead'; cAim3.appendChild(lfS.node);
+      pAim.appendChild(cAim3);
 
-      pAim.appendChild(sec('fa-lock', 'Aim Lock'));
+      var cAim4 = card('fa-lock', 'Aim Lock Control');
       var aimT = toggle('aim_lock', false, function (on) { if (on) window.__pb.on(); else window.__pb.off(); });
-      pAim.appendChild(row('Aim lock', aimT.node, 'Auto aim ke target'));
+      cAim4.appendChild(row('Aim lock', aimT.node, 'Auto aim'));
       var autoFireT = toggle('aim_autofire', false, function (on) { P.autoFire = on ? 1 : 0; });
-      pAim.appendChild(row('Auto fire', autoFireT.node, 'Tembak otomatis saat lock'));
+      cAim4.appendChild(row('Auto fire', autoFireT.node, 'Tembak otomatis'));
       var invertT = toggle('aim_invert', false, function (on) { O.invert = on; });
-      pAim.appendChild(row('Invert Y', invertT.node, 'Balik arah vertikal'));
+      cAim4.appendChild(row('Invert Y', invertT.node, 'Balik vertikal'));
+      pAim.appendChild(cAim4);
 
+      /* ================= AIMBOT ================= */
       var pAb = addTab('aimbot', 'AIMBOT');
-      pAb.appendChild(sec('fa-bullseye', 'Aimbot'));
+      var cAb1 = card('fa-bullseye', 'Aimbot Settings', 'PREMIUM');
       var aimbotT = toggle('aimbot_en', false, function (on) { window.__pb.aimbot(on); });
-      pAb.appendChild(rowRisk('Enable aimbot', aimbotT.node, 'Snap saat fire + wajib POV'));
-      var abGainS = slider(0.5, 3.0, 0.05, P.aimbotGain,
-        function (v) { return 'x' + v.toFixed(2); },
-        function (v) { window.__pb.aimbotGain(v); });
-      abGainS.label.textContent = 'Snap speed'; pAb.appendChild(abGainS.node);
-      var abHoldS = slider(50, 800, 10, P.aimbotHoldMs,
-        function (v) { return v.toFixed(0) + 'ms'; },
-        function (v) { window.__pb.aimbotHold(v); });
-      abHoldS.label.textContent = 'Lock duration'; pAb.appendChild(abHoldS.node);
+      cAb1.appendChild(rowRisk('Enable aimbot', aimbotT.node, 'Snap saat fire'));
+      var abGainS = slider(0.5, 3.0, 0.05, P.aimbotGain, function (v) { return 'x' + v.toFixed(2); }, function (v) { window.__pb.aimbotGain(v); });
+      abGainS.label.textContent = 'Snap'; cAb1.appendChild(abGainS.node);
+      var abHoldS = slider(50, 800, 10, P.aimbotHoldMs, function (v) { return v.toFixed(0) + 'ms'; }, function (v) { window.__pb.aimbotHold(v); });
+      abHoldS.label.textContent = 'Lock dur'; cAb1.appendChild(abHoldS.node);
+      pAb.appendChild(cAb1);
 
-      pAb.appendChild(sec('fa-circle-notch', 'POV Circle'));
+      var cAb2 = card('fa-circle-notch', 'POV Circle');
       var fcT = toggle('pov_circle_show', false, function (on) { window.__pbx.fovc(on); });
-      pAb.appendChild(row('Show circle', fcT.node, 'Ring POV'));
-      var povCircleS = slider(1, 1500, 1, P.povCircleR,
-        function (v) { return v.toFixed(0) + 'px'; },
-        function (v) { window.__pb.povCircle(v); });
-      povCircleS.label.textContent = 'Circle size';
-      pAb.appendChild(povCircleS.node);
+      cAb2.appendChild(row('Show circle', fcT.node, 'Ring POV'));
+      var povCircleS = slider(1, 1500, 1, P.povCircleR, function (v) { return v.toFixed(0) + 'px'; }, function (v) { window.__pb.povCircle(v); });
+      povCircleS.label.textContent = 'Size'; cAb2.appendChild(povCircleS.node);
+      pAb.appendChild(cAb2);
 
+      /* ================= ESP ================= */
       var pEsp = addTab('esp', 'ESP');
-      pEsp.appendChild(sec('fa-layer-group', 'Overlay'));
+      var cEsp1 = card('fa-layer-group', 'ESP Settings', 'PREMIUM');
       var espT = toggle('esp_enemy', false, function (on) { if (on) window.__pbvis.on(); else window.__pbvis.off(); });
-      pEsp.appendChild(row('Enemy ESP', espT.node, 'Box + HP bar (Light & Synced)'));
+      cEsp1.appendChild(row('Enemy ESP', espT.node, 'Box ungu + HP'));
       var espNameT = toggle('esp_name', false, function (on) { window.__pbvis.name(on); });
-      pEsp.appendChild(rowNew('ESP name', espNameT.node, 'Nama di atas box'));
-      var boneT = toggle('esp_bone', false, function (on) { window.__pbvis.bone(on, BE.range); });
-      pEsp.appendChild(rowRisk('Bone ESP', boneT.node, 'Skeleton musuh'));
-      var boneRangeS = slider(20, 120, 5, BE.range, function (v) { return v + 'm'; }, function (v) { BE.range = v; if (BE.on) window.__pbvis.bone(1, v); });
-      boneRangeS.label.textContent = 'Bone range'; pEsp.appendChild(boneRangeS.node);
+      cEsp1.appendChild(rowNew('ESP name', espNameT.node, 'Nama di atas box'));
       var hpoT = toggle('esp_hp', false, function (on) { window.__pbx.hpo(on); });
-      pEsp.appendChild(row('HP overlay', hpoT.node, 'Angka HP'));
-      var rdT = toggle('esp_radar', false, function (on) { window.__pbx.radar(on); });
-      pEsp.appendChild(row('Radar mini', rdT.node, 'Minimap musuh'));
+      cEsp1.appendChild(row('HP overlay', hpoT.node, 'Bar + angka HP'));
+      var boneT = toggle('esp_bone', false, function (on) { window.__pbvis.bone(on, BE.range); });
+      cEsp1.appendChild(rowRisk('Bone ESP', boneT.node, 'Skeleton RGB'));
+      var boneRangeS = slider(20, 120, 5, BE.range, function (v) { return v + 'm'; }, function (v) { BE.range = v; if (BE.on) window.__pbvis.bone(1, v); });
+      boneRangeS.label.textContent = 'Range'; cEsp1.appendChild(boneRangeS.node);
       var trT = toggle('esp_tracer', false, function (on) { window.__pbx.tracer(on); });
-      pEsp.appendChild(row('ESP tracer', trT.node, 'Garis ke musuh'));
+      cEsp1.appendChild(rowNew('ESP tracer', trT.node, 'Garis ungu solid'));
+      var rdT = toggle('esp_radar', false, function (on) { window.__pbx.radar(on); });
+      cEsp1.appendChild(row('Radar mini', rdT.node, 'Minimap musuh'));
+      pEsp.appendChild(cEsp1);
 
-      pEsp.appendChild(sec('fa-heart-pulse', 'Damage'));
+      var cEsp2 = card('fa-heart-pulse', 'Damage Multiplier');
       var dmgS = slider(1.0, 3.0, 0.05, 1.3, function (v) { return 'x' + v.toFixed(2); }, function (v) { if (window.__pbvis) window.__pbvis.dmg(v); });
-      dmgS.label.textContent = 'Damage'; pEsp.appendChild(dmgS.node);
+      dmgS.label.textContent = 'Damage'; cEsp2.appendChild(dmgS.node);
+      pEsp.appendChild(cEsp2);
 
+      /* ================= SILENT ================= */
       var pSil = addTab('silent', 'SILENT');
-      pSil.appendChild(sec('fa-crosshairs', 'Silent Aim'));
+      var cSil1 = card('fa-crosshairs', 'Silent Aim', 'PREMIUM');
       var saT = toggle('silent_aim', false, function (on) { window.__pbx.silent(on); });
-      pSil.appendChild(rowRisk('Silent aim', saT.node, 'Peluru auto ke kepala (360°)'));
+      cSil1.appendChild(rowRisk('Silent aim', saT.node, 'Peluru auto ke kepala'));
       var saFovS = slider(30, 360, 5, SA.fovRad * 180 / Math.PI, function (v) { return v.toFixed(0) + '°'; }, function (v) { window.__pbx.silentFov(v); });
-      saFovS.label.textContent = 'Silent FOV'; pSil.appendChild(saFovS.node);
+      saFovS.label.textContent = 'FOV'; cSil1.appendChild(saFovS.node);
       var saTgt = el('div', 'fk-sa-tgt', 'target: —');
-      pSil.appendChild(saTgt);
+      cSil1.appendChild(saTgt);
       var tbT = toggle('auto_trig', false, function (on) { window.__pbx.trig(on); });
-      pSil.appendChild(rowRisk('Auto trigger', tbT.node, 'Tembak saat target masuk'));
+      cSil1.appendChild(rowRisk('Auto trigger', tbT.node, 'Tembak saat target masuk'));
+      pSil.appendChild(cSil1);
 
-      pSil.appendChild(sec('fa-bullseye', 'Prediction'));
+      var cSil2 = card('fa-bullseye', 'Prediction');
       var predT = toggle('pred_lead', false, function (on) { window.__pbx.pred(on, PR.ms); });
-      pSil.appendChild(rowRisk('Prediction (lead)', predT.node, 'Aim ke depan target'));
+      cSil2.appendChild(rowRisk('Prediction (lead)', predT.node, 'Aim ke depan target'));
       var predS = slider(0, 400, 10, PR.ms, function (v) { return v.toFixed(0) + 'ms'; }, function (v) { PR.ms = v; if (PR.on) window.__pbx.pred(1, v); });
-      predS.label.textContent = 'Lead time'; pSil.appendChild(predS.node);
+      predS.label.textContent = 'Lead time'; cSil2.appendChild(predS.node);
+      pSil.appendChild(cSil2);
 
+      /* ================= SHOOT ================= */
       var pShoot = addTab('shoot', 'SHOOT');
-      pShoot.appendChild(sec('fa-gun', 'Fire Rate'));
+      var cSh1 = card('fa-gun', 'Fire Rate');
       var sfT = toggle('smooth_fire', false, function (on) { window.__pbx.smoothFire(on); });
-      pShoot.appendChild(row('Smooth fire', sfT.node, 'Anti macet'));
-      
+      cSh1.appendChild(row('Smooth fire', sfT.node, 'Anti macet'));
       var rapidT = toggle('rapid_fire', false, function (on) { window.__pbx.rapid(on); });
-      pShoot.appendChild(rowRisk('Force Auto (Rifling)', rapidT.node, 'Sniper/Pistol/Shotgun otomatis'));
-      
+      cSh1.appendChild(rowRisk('Force Auto', rapidT.node, 'Sniper/Pistol auto'));
       var isT2 = toggle('inst_scope', false, function (on) { window.__pbx.instScope(on); });
-      pShoot.appendChild(rowRisk('Instant scope', isT2.node, 'Scope cepat'));
+      cSh1.appendChild(rowRisk('Instant scope', isT2.node, 'Scope cepat'));
+      pShoot.appendChild(cSh1);
 
+      /* ================= COMBAT ================= */
       var pCombat = addTab('combat', 'COMBAT');
-      pCombat.appendChild(sec('fa-shield-halved', 'Weapon'));
+      var cCb1 = card('fa-shield-halved', 'Weapon');
       var wallT = toggle('combat_wallbang', false, function (on) { window.__pbx.wallbang(on); });
-      pCombat.appendChild(rowRisk('Wallbang', wallT.node, 'Tembus dinding'));
+      cCb1.appendChild(rowRisk('Wallbang', wallT.node, 'Tembus dinding'));
       var ammoT = toggle('combat_infammo', false, function (on) { window.__pbx.infAmmo(on); });
-      pCombat.appendChild(rowRisk('Infinite ammo', ammoT.node, 'Ammo tak habis'));
+      cCb1.appendChild(rowRisk('Infinite ammo', ammoT.node, 'Ammo tak habis'));
       var nrecT = toggle('combat_norecoil', false, function (on) { window.__pbx.noRecoil(on); });
-      pCombat.appendChild(rowRisk('No recoil', nrecT.node, 'Recoil nol'));
+      cCb1.appendChild(rowRisk('No recoil', nrecT.node, 'Recoil nol'));
+      pCombat.appendChild(cCb1);
 
+      /* ================= FLY ================= */
       var pFly = addTab('fly', 'FLY');
-      pFly.appendChild(sec('fa-plane', 'Fly'));
+      var cFly1 = card('fa-plane', 'Fly Settings');
       var flyT = toggle('fly_on', false, function (on) { window.__pbx.fly(on); });
-      pFly.appendChild(rowRisk('Fly', flyT.node, 'Hold jump = naik'));
+      cFly1.appendChild(rowRisk('Fly', flyT.node, 'Hold jump = naik'));
       var flyBypassT = toggle('fly_bypass', false, function (on) { window.__pbx.flyBypass(on); });
-      pFly.appendChild(rowRisk('Fly bypass', flyBypassT.node, 'Anti deteksi fly'));
+      cFly1.appendChild(rowRisk('Fly bypass', flyBypassT.node, 'Anti deteksi'));
       var flyModeSel = el('select', 'fk-select');
-      flyModeSel.innerHTML =
-        '<option value="jump">Jump</option>' +
-        '<option value="hover">Hover</option>';
+      flyModeSel.innerHTML = '<option value="jump">Jump</option><option value="hover">Hover</option>';
       flyModeSel.value = FLY.mode;
       flyModeSel.addEventListener('change', function () { window.__pbx.flyMode(this.value); });
-      pFly.appendChild(flyModeSel);
+      cFly1.appendChild(flyModeSel);
+      pFly.appendChild(cFly1);
 
+      /* ================= NOCLIP ================= */
       var pNc = addTab('noclip', 'NOCLIP');
-      pNc.appendChild(sec('fa-ghost', 'Noclip'));
+      var cNc1 = card('fa-ghost', 'Noclip');
       var ncT = toggle('noclip_real', false, function (on) { window.__pbx.noclip(on); });
-      pNc.appendChild(rowRisk('Noclip (real)', ncT.node, 'Tembus dinding'));
+      cNc1.appendChild(rowRisk('Noclip (real)', ncT.node, 'Tembus dinding'));
+      pNc.appendChild(cNc1);
 
+      /* ================= NADE ================= */
       var pNade = addTab('nade', 'NADE');
-      pNade.appendChild(sec('fa-bomb', 'Silent Nade'));
+      var cNd1 = card('fa-bomb', 'Silent Nade');
       var snadeT = toggle('silent_nade', false, function (on) { window.__pbx.silentNade(on); });
-      pNade.appendChild(rowRisk('Silent nade', snadeT.node, 'Granat ngejar target'));
+      cNd1.appendChild(rowRisk('Silent nade', snadeT.node, 'Granat ngejar target'));
       var snadeBypassT = toggle('silent_nade_bp', false, function (on) { window.__pbx.silentNadeBypass(on); });
-      pNade.appendChild(rowRisk('Nade bypass', snadeBypassT.node, 'Anti deteksi nade'));
+      cNd1.appendChild(rowRisk('Nade bypass', snadeBypassT.node, 'Anti deteksi'));
       var snadeHomeT = toggle('silent_nade_home', false, function (on) { window.__pbx.silentNadeHoming(on); });
-      pNade.appendChild(rowRisk('Homing', snadeHomeT.node, 'Teleport tiap frame'));
+      cNd1.appendChild(rowRisk('Homing', snadeHomeT.node, 'Teleport tiap frame'));
       var snadeLosT = toggle('silent_nade_los', false, function (on) { window.__pbx.silentNadeLOS(on); });
-      pNade.appendChild(rowRisk('Require LOS', snadeLosT.node, 'Hanya target kelihatan'));
+      cNd1.appendChild(rowRisk('Require LOS', snadeLosT.node, 'Hanya target kelihatan'));
       var snadeStat = el('div', 'fk-sa-tgt', 'snade: off');
-      pNade.appendChild(snadeStat);
+      cNd1.appendChild(snadeStat);
+      pNade.appendChild(cNd1);
 
-      pNade.appendChild(sec('fa-bomb', 'Unlimited Grenade'));
+      var cNd2 = card('fa-bomb', 'Unlimited Grenade', 'NEW');
       var infNadeT = toggle('inf_nade', false, function (on) { window.__pbx.infNade(on); });
-      pNade.appendChild(rowNew('Unlimited Grenade', infNadeT.node, 'Semua granat unlimited'));
-      var infNadeMaxS = slider(1, 999, 1, FL.infNadeMax,
-        function (v) { return v.toFixed(0) + 'x'; },
-        function (v) { window.__pbx.infNadeMax(v); });
-      infNadeMaxS.label.textContent = 'Max ammo';
-      pNade.appendChild(infNadeMaxS.node);
+      cNd2.appendChild(rowNew('Unlimited Grenade', infNadeT.node, 'Semua granat unlimited'));
+      var infNadeMaxS = slider(1, 999, 1, FL.infNadeMax, function (v) { return v.toFixed(0) + 'x'; }, function (v) { window.__pbx.infNadeMax(v); });
+      infNadeMaxS.label.textContent = 'Max'; cNd2.appendChild(infNadeMaxS.node);
       var infNadeSt = el('div', 'fk-nade-st', 'memuat…');
-      pNade.appendChild(infNadeSt);
+      cNd2.appendChild(infNadeSt);
+      pNade.appendChild(cNd2);
 
+      /* ================= MOVE ================= */
       var pMove = addTab('move', 'MOVE');
-      pMove.appendChild(sec('fa-feather', 'Survival'));
+      var cMv1 = card('fa-feather', 'Survival');
       var noFallT = toggle('no_fall', false, function (on) { window.__pbx.noFall(on); });
-      pMove.appendChild(row('No fall damage', noFallT.node, 'Tidak mati jatuh'));
+      cMv1.appendChild(row('No fall damage', noFallT.node, 'Tidak mati jatuh'));
+      pMove.appendChild(cMv1);
 
-      /* ===== TAB MACRO ===== */
+      /* ================= MACRO ================= */
       var pMacro = addTab('macro', 'MACRO');
-      pMacro.appendChild(sec('fa-bolt', 'Makro Auto QQ'));
-      var qqT = toggle('auto_qq', false, function (on) {
-        window.__pbx.autoQQ(on);
-      });
-      pMacro.appendChild(rowNew('Auto QQ', qqT.node, 'Ammo keluar → melee → slot utama (fast)'));
+      var cMac1 = card('fa-bolt', 'Makro Auto QQ', 'NEW');
+      var qqT = toggle('auto_qq', false, function (on) { window.__pbx.autoQQ(on); });
+      cMac1.appendChild(rowNew('Auto QQ', qqT.node, 'Ammo keluar → melee → slot utama'));
 
       var qqPrimarySel = el('select', 'fk-select');
-      qqPrimarySel.innerHTML =
-        '<option value="1">Slot 1 (Primer)</option>' +
-        '<option value="2">Slot 2 (Sekunder)</option>';
+      qqPrimarySel.innerHTML = '<option value="1">Slot 1 (Primer)</option><option value="2">Slot 2 (Sekunder)</option>';
       try {
         var savedPrimary = localStorage.getItem('ir_qq_primary');
         qqPrimarySel.value = (savedPrimary === '2') ? '2' : '1';
         MQQ.primarySlot = qqPrimarySel.value === '2' ? 2 : 1;
       } catch (e) { qqPrimarySel.value = '1'; MQQ.primarySlot = 1; }
-      qqPrimarySel.addEventListener('change', function () {
-        window.__pbx.autoQQPrimary(+this.value);
-      });
+      qqPrimarySel.addEventListener('change', function () { window.__pbx.autoQQPrimary(+this.value); });
       var qqPrimaryRow = el('div', 'fk-slider');
-      qqPrimaryRow.style.cssText = 'padding:2px 0;display:flex;align-items:center;gap:6px';
+      qqPrimaryRow.style.cssText = 'padding:1px 0;display:flex;align-items:center;gap:4px';
       var qqPrimaryLbl = el('label', null, 'Swap ke');
-      qqPrimaryLbl.style.cssText = 'flex:0 0 80px;font-size:10px;color:#334155';
+      qqPrimaryLbl.style.cssText = 'flex:0 0 50px;font-size:7px;color:#a99bcb';
       qqPrimarySel.style.cssText = 'flex:1;margin-top:0';
-      qqPrimaryRow.appendChild(qqPrimaryLbl);
-      qqPrimaryRow.appendChild(qqPrimarySel);
-      pMacro.appendChild(qqPrimaryRow);
+      qqPrimaryRow.appendChild(qqPrimaryLbl); qqPrimaryRow.appendChild(qqPrimarySel);
+      cMac1.appendChild(qqPrimaryRow);
 
       var qqPresetSel = el('select', 'fk-select');
       qqPresetSel.innerHTML =
-        '<option value="ultra">Ultra (26ms) — melee nyaris invisible</option>' +
-        '<option value="fast">Fast (38ms) — default, stabil</option>' +
-        '<option value="medium">Medium (62ms) — melee kelihatan tipis</option>' +
-        '<option value="safe">Safe (105ms) — paling aman, melee kelihatan</option>';
+        '<option value="ultra">Ultra (26ms)</option>' +
+        '<option value="fast">Fast (38ms)</option>' +
+        '<option value="medium">Medium (62ms)</option>' +
+        '<option value="safe">Safe (105ms)</option>';
       qqPresetSel.value = 'fast';
       qqPresetSel.addEventListener('change', function () {
         try { window.__pbx.autoQQPreset(this.value); syncQqTiming(); } catch (e) {}
       });
       var qqPresetRow = el('div', 'fk-slider');
-      qqPresetRow.style.cssText = 'padding:2px 0;display:flex;align-items:center;gap:6px';
+      qqPresetRow.style.cssText = 'padding:1px 0;display:flex;align-items:center;gap:4px';
       var qqPresetLbl = el('label', null, 'Preset');
-      qqPresetLbl.style.cssText = 'flex:0 0 80px;font-size:10px;color:#334155';
+      qqPresetLbl.style.cssText = 'flex:0 0 50px;font-size:7px;color:#a99bcb';
       qqPresetSel.style.cssText = 'flex:1;margin-top:0';
-      qqPresetRow.appendChild(qqPresetLbl);
-      qqPresetRow.appendChild(qqPresetSel);
-      pMacro.appendChild(qqPresetRow);
+      qqPresetRow.appendChild(qqPresetLbl); qqPresetRow.appendChild(qqPresetSel);
+      cMac1.appendChild(qqPresetRow);
 
-      var qqMeleeS = slider(5, 200, 1, MQQ.tSettleMelee,
-        function (v) { return v.toFixed(0) + 'ms'; },
-        function (v) {
-          MQQ.tSettleMelee = v;
-          try { window.__pbx.autoQQTiming(MQQ.tSettleMelee, MQQ.tReturnDelay, MQQ.tSettlePrimary); } catch (e) {}
-          updateQqCycleLabel();
-        });
-      qqMeleeS.label.textContent = 'Melee settle';
-      pMacro.appendChild(qqMeleeS.node);
+      var qqMeleeS = slider(5, 200, 1, MQQ.tSettleMelee, function (v) { return v.toFixed(0) + 'ms'; }, function (v) {
+        MQQ.tSettleMelee = v;
+        try { window.__pbx.autoQQTiming(MQQ.tSettleMelee, MQQ.tReturnDelay, MQQ.tSettlePrimary); } catch (e) {}
+        updateQqCycleLabel();
+      });
+      qqMeleeS.label.textContent = 'Melee'; cMac1.appendChild(qqMeleeS.node);
 
-      var qqRetS = slider(5, 200, 1, MQQ.tReturnDelay,
-        function (v) { return v.toFixed(0) + 'ms'; },
-        function (v) {
-          MQQ.tReturnDelay = v;
-          try { window.__pbx.autoQQTiming(MQQ.tSettleMelee, MQQ.tReturnDelay, MQQ.tSettlePrimary); } catch (e) {}
-          updateQqCycleLabel();
-        });
-      qqRetS.label.textContent = 'Return delay';
-      pMacro.appendChild(qqRetS.node);
+      var qqRetS = slider(5, 200, 1, MQQ.tReturnDelay, function (v) { return v.toFixed(0) + 'ms'; }, function (v) {
+        MQQ.tReturnDelay = v;
+        try { window.__pbx.autoQQTiming(MQQ.tSettleMelee, MQQ.tReturnDelay, MQQ.tSettlePrimary); } catch (e) {}
+        updateQqCycleLabel();
+      });
+      qqRetS.label.textContent = 'Return'; cMac1.appendChild(qqRetS.node);
 
-      var qqPriS = slider(5, 200, 1, MQQ.tSettlePrimary,
-        function (v) { return v.toFixed(0) + 'ms'; },
-        function (v) {
-          MQQ.tSettlePrimary = v;
-          try { window.__pbx.autoQQTiming(MQQ.tSettleMelee, MQQ.tReturnDelay, MQQ.tSettlePrimary); } catch (e) {}
-          updateQqCycleLabel();
-        });
-      qqPriS.label.textContent = 'Primary settle';
-      pMacro.appendChild(qqPriS.node);
+      var qqPriS = slider(5, 200, 1, MQQ.tSettlePrimary, function (v) { return v.toFixed(0) + 'ms'; }, function (v) {
+        MQQ.tSettlePrimary = v;
+        try { window.__pbx.autoQQTiming(MQQ.tSettleMelee, MQQ.tReturnDelay, MQQ.tSettlePrimary); } catch (e) {}
+        updateQqCycleLabel();
+      });
+      qqPriS.label.textContent = 'Primary'; cMac1.appendChild(qqPriS.node);
 
       var qqCycleLbl = el('div', 'fk-qq-st', 'cycle: 38ms');
-      qqCycleLbl.style.fontSize = '9px';
-      qqCycleLbl.style.padding = '2px 6px';
-      pMacro.appendChild(qqCycleLbl);
+      cMac1.appendChild(qqCycleLbl);
 
       function updateQqCycleLabel() {
         try {
@@ -3150,72 +3209,78 @@
       }
       function syncQqTiming() {
         try {
-          qqMeleeS.set(MQQ.tSettleMelee);
-          qqRetS.set(MQQ.tReturnDelay);
-          qqPriS.set(MQQ.tSettlePrimary);
-          updateQqCycleLabel();
+          qqMeleeS.set(MQQ.tSettleMelee); qqRetS.set(MQQ.tReturnDelay);
+          qqPriS.set(MQQ.tSettlePrimary); updateQqCycleLabel();
         } catch (e) {}
       }
       updateQqCycleLabel();
 
       var qqStat = el('div', 'fk-qq-st', 'auto QQ: off');
-      pMacro.appendChild(qqStat);
+      cMac1.appendChild(qqStat);
+      pMacro.appendChild(cMac1);
 
+      /* ================= MISC ================= */
       var pMisc = addTab('misc', 'MISC');
-
-      pMisc.appendChild(sec('fa-right-left', 'Quick Swap'));
+      var cMs1 = card('fa-right-left', 'Quick Swap');
       var qcT = toggle('quick_swap', false, function (on) { if (on) window.__pbqc.on(); else window.__pbqc.off(); });
-      pMisc.appendChild(row('Quick swap', qcT.node, 'Ganti senjata instan'));
+      cMs1.appendChild(row('Quick swap', qcT.node, 'Ganti senjata instan'));
       var qcFastT = toggle('inst_swap', false, function (on) { window.__pbqc.cfg({ fast: on ? 1 : 0 }); });
-      pMisc.appendChild(row('Instant swap', qcFastT.node, 'Skip animasi'));
+      cMs1.appendChild(row('Instant swap', qcFastT.node, 'Skip animasi'));
       var swapBtn = el('div', 'fk-btn');
       swapBtn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Swap (Q)';
       swapBtn.addEventListener('click', function () { try { window.__pbqc.swap(); } catch (e) {} });
       var swapWrap = el('div', 'fk-btns');
-      swapWrap.appendChild(swapBtn); pMisc.appendChild(swapWrap);
+      swapWrap.appendChild(swapBtn); cMs1.appendChild(swapWrap);
+      pMisc.appendChild(cMs1);
 
-      pMisc.appendChild(sec('fa-heart', 'Survival'));
+      var cMs2 = card('fa-heart', 'Survival');
       var irT = toggle('inst_respawn', false, function (on) { window.__pbx.respawn(on); });
-      pMisc.appendChild(row('Instant respawn', irT.node, 'Hidup langsung'));
+      cMs2.appendChild(row('Instant respawn', irT.node, 'Hidup langsung'));
       var godT = toggle('godmode', false, function (on) { window.__pbx.godmode(on); });
-      pMisc.appendChild(rowRisk('Godmode', godT.node, 'Unlimited spawn flicker'));
+      cMs2.appendChild(rowRisk('Godmode', godT.node, 'Unlimited spawn flicker'));
+      pMisc.appendChild(cMs2);
 
-      pMisc.appendChild(sec('fa-toolbox', 'Utility'));
+      var cMs3 = card('fa-toolbox', 'Utility');
       var akT = toggle('anti_kick', false, function (on) { window.__pbx.antiKick(on); });
-      pMisc.appendChild(rowRisk('Anti-kick', akT.node, 'Blokir kick/ban'));
+      cMs3.appendChild(rowRisk('Anti-kick', akT.node, 'Blokir kick/ban'));
+      pMisc.appendChild(cMs3);
 
+      /* ================= INFO ================= */
       var pInfo = addTab('info', 'INFO');
-      pInfo.appendChild(sec('fa-signal', 'Status'));
+      var cInf1 = card('fa-signal', 'Status');
       var foot = el('div', 'fk-foot', '');
-      pInfo.appendChild(foot);
+      cInf1.appendChild(foot);
       var statBox = el('div', 'fk-foot', '');
-      statBox.style.marginTop = '3px'; pInfo.appendChild(statBox);
+      cInf1.appendChild(statBox);
+      pInfo.appendChild(cInf1);
 
-      pInfo.appendChild(sec('fa-key', 'Bypass'));
-      var bypassInfo = el('div', null, '');
-      bypassInfo.style.cssText = 'font-size:9px;line-height:1.4;color:#a0aab5';
+      var cInf2 = card('fa-key', 'Bypass');
+      var bypassInfo = el('div');
+      bypassInfo.style.cssText = 'font-size:6.5px;line-height:1.3;color:#6f5f92';
       bypassInfo.innerHTML =
-        '<div>L1 preboot · flex gate</div>' +
-        '<div>L1b integrity check bypass</div>' +
-        '<div>L2 hide · L3 self-heal · L4 fp-rotate</div>' +
-        '<div>L5 direct-state-write · L6 bone-accurate</div>' +
-        '<div>Fly bypass: throttle + stealth write</div>' +
-        '<div>Silent nade bypass: rAF chase</div>' +
-        '<div>Aimbot: POV + LOS realtime (80ms)</div>' +
-        '<div>ESP: 0ms Delay & GPU Accel</div>' +
-        '<div>Auto QQ: pattern 1-3-1 / 2-3-2 (pilih slot)</div>' +
-        '<div>Silent aim: 360° FOV + hitTest rewrite</div>' +
-        '<div>Instant swap: nextShot gate + anim skip</div>';
-      pInfo.appendChild(bypassInfo);
+        'L1 preboot · flex gate<br>' +
+        'L1b integrity check bypass<br>' +
+        'L2 hide · L3 self-heal · L4 fp-rotate<br>' +
+        'L5 direct-state-write · L6 bone-accurate<br>' +
+        'Fly bypass: throttle + stealth write<br>' +
+        'Silent nade bypass: rAF chase<br>' +
+        'Aimbot: POV + LOS realtime (80ms)<br>' +
+        'ESP: 30fps optimized · GPU Accel<br>' +
+        'Tracer: ungu solid single-pass<br>' +
+        'Auto QQ: pattern 1-3-1 / 2-3-2<br>' +
+        'Silent aim: 360° FOV + hitTest rewrite<br>' +
+        'Instant swap: nextShot gate + anim skip';
+      cInf2.appendChild(bypassInfo);
+      pInfo.appendChild(cInf2);
 
-      pInfo.appendChild(sec('fa-triangle-exclamation', 'Danger'));
+      var cInf3 = card('fa-triangle-exclamation', 'Danger Zone');
       var resetBtn = el('div', 'fk-btn danger');
       resetBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i> Reset semua';
       resetBtn.addEventListener('click', function () {
         try {
           var keys = Object.keys(localStorage);
-          for(var i=0; i<keys.length; i++) {
-            if(keys[i].indexOf('iril_tg_') === 0) localStorage.removeItem(keys[i]);
+          for (var i = 0; i < keys.length; i++) {
+            if (keys[i].indexOf('iril_tg_') === 0) localStorage.removeItem(keys[i]);
           }
           try { localStorage.removeItem('ir_qq_primary'); } catch (e) {}
           window.__pb.off(); window.__pbvis.off();
@@ -3229,19 +3294,13 @@
           window.__pbx.antiKick(0); window.__pbx.smoothFire(0);
           window.__pb.aimbot(0);
           window.__pbvis.bone(0); window.__pbvis.name(0);
-          window.__pb.hitbox('head');
-          window.__pb.bulletSpeed(350);
-          window.__pb.leadFactor(1.0);
-          window.__pbx.silentFov(180);
+          window.__pb.hitbox('head'); window.__pb.bulletSpeed(350);
+          window.__pb.leadFactor(1.0); window.__pbx.silentFov(180);
           window.__pb.lockMode('pov');
           window.__pbx.fly(false); window.__pbx.flyMode('jump');
-          window.__pbx.flyBypass(0);
-          window.__pbx.silentNade(0);
-          window.__pbx.silentNadeBypass(0);
-          window.__pbx.infNade(0); window.__pbx.infNadeMax(99);
-          window.__pbx.noFall(0);
-          window.__pbx.autoQQ(0);
-          window.__pbx.autoQQPrimary(1);
+          window.__pbx.flyBypass(0); window.__pbx.silentNade(0);
+          window.__pbx.silentNadeBypass(0); window.__pbx.infNade(0); window.__pbx.infNadeMax(99);
+          window.__pbx.noFall(0); window.__pbx.autoQQ(0); window.__pbx.autoQQPrimary(1);
           try { MQQ.primarySlot = 1; if (qqPrimarySel) qqPrimarySel.value = '1'; } catch (e) {}
           try { MQQ.lastSyncedSlot = -1; MQQ.freezeUntil = 0; MQQ.guardUntil = 0; MQQ.pendingTrigger = 0; } catch (e) {}
           try {
@@ -3254,8 +3313,9 @@
         } catch (e) {}
       });
       var resetWrap = el('div', 'fk-btns');
-      resetWrap.appendChild(resetBtn); pInfo.appendChild(resetWrap);
-      pInfo.appendChild(el('div', 'fk-warn', 'Fitur RISK bisa terdeteksi server.'));
+      resetWrap.appendChild(resetBtn); cInf3.appendChild(resetWrap);
+      cInf3.appendChild(el('div', 'fk-warn', 'Fitur RISK bisa terdeteksi server.'));
+      pInfo.appendChild(cInf3);
 
       function refreshFoot() {
         try {
@@ -3278,43 +3338,28 @@
 
           if (window.__pbx) {
             var x2 = window.__pbx.st();
-            if (x2.saHead) {
-              saTgt.textContent = 'target: ' + x2.saHead.name + ' (' + Math.round(x2.saHead.hp) + 'hp)';
-            } else {
-              saTgt.textContent = SA.on ? 'target: —' : 'target: off';
-            }
+            if (x2.saHead) { saTgt.textContent = 'target: ' + x2.saHead.name + ' (' + Math.round(x2.saHead.hp) + 'hp)'; }
+            else { saTgt.textContent = SA.on ? 'target: —' : 'target: off'; }
             if (snadeStat) {
               if (x2.silentNade) {
                 var sns = window.__pbx.silentNadeSt();
-                snadeStat.textContent = 'snade: ON · ' + sns.nadeCount + ' chase · ' +
-                  (sns.hasTarget ? 'lock ✓' : 'lock —') +
-                  ' · bypass ' + (sns.bypass ? '✓' : '✕');
-              } else {
-                snadeStat.textContent = 'snade: off';
-              }
+                snadeStat.textContent = 'snade: ON · ' + sns.nadeCount + ' chase · ' + (sns.hasTarget ? 'lock ✓' : 'lock —') + ' · bypass ' + (sns.bypass ? '✓' : '✕');
+              } else { snadeStat.textContent = 'snade: off'; }
             }
             if (infNadeSt) {
               var ngs = window.__pbx.infNadeSt();
               if (ngs.grenades.length) {
                 infNadeSt.innerHTML = 'unlimited: <b>' + (ngs.on ? 'ON' : 'OFF') + '</b> · max ' + ngs.max + 'x · refilled ' + ngs.count + 'x<br>' +
-                  ngs.grenades.map(function (g) {
-                    return 'slot ' + g.slot + ': ' + g.name + ' (' + (g.kind || '?') + ') = ' + g.ammo;
-                  }).join('<br>');
+                  ngs.grenades.map(function (g) { return 'slot ' + g.slot + ': ' + g.name + ' (' + (g.kind || '?') + ') = ' + g.ammo; }).join('<br>');
               } else {
                 infNadeSt.textContent = 'unlimited: ' + (ngs.on ? 'ON' : 'OFF') + ' · belum ada granat';
               }
             }
             if (qqStat) {
               var qs = window.__pbx.autoQQSt();
-              var pattern = qs.activePrimarySlot > 0
-                ? qs.activePrimarySlot + '-' + (qs.meleeSlot >= 0 ? qs.meleeSlot : '3') + '-' + qs.activePrimarySlot
-                : '—';
-              qqStat.textContent = 'auto QQ: ' + (qs.on ? 'ON' : 'OFF') +
-                ' · primary: slot ' + (qs.primarySlot >= 0 ? qs.primarySlot : '?') +
-                ' · pattern: ' + pattern +
-                ' · swaps: ' + qs.qqCount +
-                (qs.busy ? ' · busy' : '') +
-                (qs.pending ? ' · pending' : '');
+              var pattern = qs.activePrimarySlot > 0 ? qs.activePrimarySlot + '-' + (qs.meleeSlot >= 0 ? qs.meleeSlot : '3') + '-' + qs.activePrimarySlot : '—';
+              qqStat.textContent = 'auto QQ: ' + (qs.on ? 'ON' : 'OFF') + ' · primary: slot ' + (qs.primarySlot >= 0 ? qs.primarySlot : '?') +
+                ' · pattern: ' + pattern + ' · swaps: ' + qs.qqCount + (qs.busy ? ' · busy' : '') + (qs.pending ? ' · pending' : '');
             }
           }
         } catch (e) { foot.textContent = '…'; }
@@ -3333,9 +3378,7 @@
             abHoldS.set(P.aimbotHoldMs);
             bsS.set(P.bulletSpeed);
             lfS.set(P.leadFactor);
-            if (lockModeSel && lockModeSel.value !== s3.lockMode) {
-              lockModeSel.value = s3.lockMode;
-            }
+            if (lockModeSel && lockModeSel.value !== s3.lockMode) lockModeSel.value = s3.lockMode;
           }
           if (window.__pbvis) {
             espT.set(!!window.__pbvis.is());
@@ -3362,18 +3405,8 @@
             try { infNadeT.set(!!x.infNade); infNadeMaxS.set(x.infNadeMax); } catch (e) {}
             try { espNameT.set(!!x.espName); } catch (e) {}
             try { qqT.set(!!x.autoQQ); } catch (e) {}
-            try {
-              if (qqPrimarySel) {
-                var pv = (MQQ.primarySlot === 2) ? '2' : '1';
-                if (qqPrimarySel.value !== pv) qqPrimarySel.value = pv;
-              }
-            } catch (e) {}
-            try {
-              if (qqMeleeS) qqMeleeS.set(MQQ.tSettleMelee);
-              if (qqRetS) qqRetS.set(MQQ.tReturnDelay);
-              if (qqPriS) qqPriS.set(MQQ.tSettlePrimary);
-              updateQqCycleLabel();
-            } catch (e) {}
+            try { if (qqPrimarySel) { var pv = (MQQ.primarySlot === 2) ? '2' : '1'; if (qqPrimarySel.value !== pv) qqPrimarySel.value = pv; } } catch (e) {}
+            try { if (qqMeleeS) qqMeleeS.set(MQQ.tSettleMelee); if (qqRetS) qqRetS.set(MQQ.tReturnDelay); if (qqPriS) qqPriS.set(MQQ.tSettlePrimary); updateQqCycleLabel(); } catch (e) {}
           }
         } catch (e) {}
       }
@@ -3382,9 +3415,8 @@
       (function () {
         var dragging = false, ox = 0, oy = 0;
         function dragStart(e) {
-          if (e.target === toggleBtn || e.target === hideUiBtn || e.target === tbOpen) return;
+          if (e.target === hideUiBtn || e.target === tbOpen || e.target === miniHeaderBtn) return;
           if (e.target.tagName === 'SELECT' || e.target.tagName === 'OPTION' || e.target.tagName === 'INPUT') return;
-          
           dragging = true;
           var clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
           var clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
@@ -3402,7 +3434,6 @@
           panel.style.right = 'auto';
         }
         function dragEnd() { dragging = false; }
-
         head.addEventListener('mousedown', dragStart);
         tabbar.addEventListener('mousedown', dragStart);
         head.addEventListener('touchstart', dragStart, { passive: true });

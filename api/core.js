@@ -10,7 +10,7 @@ module.exports = (req, res) => {
       return res.status(403).send('//DENIED');
     }
 
-    const filePath = path.join(process.cwd(), 'public', 'scrip.js');
+    const filePath = path.join(process.cwd(), 'public', 'script.js');
     const coreCode = fs.readFileSync(filePath, 'utf8');
 
     res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
